@@ -48,6 +48,8 @@
   <ItemGroup>
     <Compile Include="Backup\BackupInfo.cs" />
     <Compile Include="Backup\BackupPackage.cs" />
+    <Compile Include="Backup\BackupProgressArgs.cs" />
+    <Compile Include="Backup\BackupProcess.cs" />
     <Compile Include="Backup\BackupSpace.cs" />
     <Compile Include="Steam\Enums.cs" />
     <Compile Include="Steam\GameInstaller.cs" />

@@ -31,9 +31,12 @@ namespace UniversalOrganiserControls.Backup
             get;
             private set;
         }
+        
+        [JsonIgnore]
+        public BackupPackage Data { get; private set; }
 
 
-        private BackupInfo(string gameName, string customIdentifier = "")
+        public BackupInfo(string gameName, string customIdentifier = "")
         {
             this.Created = DateTime.Now;
             this.GameName = gameName;
@@ -69,6 +72,8 @@ namespace UniversalOrganiserControls.Backup
                 jsonSettings.NullValueHandling = NullValueHandling.Ignore;
                 jsonSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
                 info = JsonConvert.DeserializeObject<BackupInfo>(content);
+                DirectoryInfo dir = new DirectoryInfo(new FileInfo(file).Directory.FullName);
+                info.Data = new BackupPackage(dir, info);
                 return info;
             }
             catch (Exception)
