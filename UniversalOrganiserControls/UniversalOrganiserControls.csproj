@@ -38,6 +38,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -68,12 +69,23 @@
     <Compile Include="Unturned3\Configuration\CommandsConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketModConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketPermissionConfig.cs" />
-    <Compile Include="Unturned3\UServer3.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\Plugin.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\PluginInfo.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\PluginInstaller.cs" />
+    <Compile Include="Unturned3\RocketMod\RocketModInstaller.cs" />
+    <Compile Include="Unturned3\U3Enums.cs" />
+    <Compile Include="Unturned3\U3Server.cs" />
+    <Compile Include="Unturned3\U3ServerEvents.cs" />
+    <Compile Include="Unturned3\U3ServerInformation.cs" />
+    <Compile Include="Unturned3\Utils\Game.cs" />
+    <Compile Include="Unturned3\Utils\Workshop.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Unturned4 %28top secret%29\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UniversalOrganiserControls.Unturned3
+namespace UniversalOrganiserControls.Unturned3.RocketMod
 {
-    public class UServer3
+    public class RocketModInstaller
     {
-
     }
 }
