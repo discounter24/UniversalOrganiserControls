@@ -10,7 +10,7 @@ namespace UniversalOrganiserControls.Unturned3
     public delegate void ServerIDChanged(object sender, U3ServerRenamedArgs e);
 
     public delegate void ServerStateChanged(object sender, U3ServerState state);
-    public delegate void PlayerlistUpdated(object sender, List<string> playerlist);
+    public delegate void PlayerlistUpdatedEvent(object sender, List<string> playerlist);
     public delegate void UPnPStateChanged(object sender, bool value);
 
     public delegate void RocketBridgeConnectionStateChanged(object instance, bool state);

@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
 using System.ServiceProcess;
+using System.Windows.Forms;
 
 using UniversalOrganiserControls;
 using UniversalOrganiserControls.Unturned3.Configuration;
 using UniversalOrganiserControls.Unturned3;
+using System.Xml;
 
 namespace UniversalOrganiserControls.Unturned3
 {
@@ -17,6 +19,7 @@ namespace UniversalOrganiserControls.Unturned3
     {
 
         public event ServerStateChanged ServerStateChanged;
+        public event PlayerlistUpdatedEvent PlayerListUpdated;
 
         private bool consoleVisibility = true;
         public bool ConsoleVisible
@@ -129,6 +132,21 @@ namespace UniversalOrganiserControls.Unturned3
 
         #endregion
 
+
+        private List<string> _PlayerList = new List<string>();
+        public List<string> PlayerList
+        {
+            get
+            {
+                return _PlayerList;
+            }
+            set
+            {
+                _PlayerList = value;
+                PlayerListUpdated.Invoke(this, _PlayerList);
+            }
+        }
+
         public bool RocketMod
         {
             get
@@ -218,12 +236,20 @@ namespace UniversalOrganiserControls.Unturned3
         }
 
         private UniversalProcess process;
-        
-        
 
-        public U3Server(U3ServerEngineSettings info)
+
+        private RocketBridgeServer RocketBridge { get; set; }
+
+        private bool DisableAutoRestartOnceFlag = false;
+        private bool EnableAutoRestartOnceFlag = false;
+
+
+        public U3Server(U3ServerEngineSettings info) : this(info, null) { }
+
+        public U3Server(U3ServerEngineSettings info, RocketBridgeServer rocketBridge)
         {
             this.ServerInformation = info;
+            this.RocketBridge = rocketBridge;
         }
 
         public U3ServerStartResult Start()
@@ -246,13 +272,22 @@ namespace UniversalOrganiserControls.Unturned3
                     ProcessProperties props = new ProcessProperties();
                     props.Executable = this.ServerInformation.Executable;
                     props.HideWindow = true;
-
+                    props.StartedCallbackTask = new Task<bool>(() =>
+                    {
+                        try
+                        {
+                            process.WaitForInputIdle(5000);
+                        }
+                        catch (Exception) {  }
+                        return true;
+                    });
 
 
                     process = new UniversalProcess(props);
                     process.StartInfo.WorkingDirectory = ServerInformation.ServerDirectory.FullName;
                     process.StartInfo.Arguments = String.Format(ServerInformation.ArgumentLine, LanServer ? "lanserver" : "internetserver", ServerInformation.ServerID);
 
+                    process.ProcessStateChanged += Process_ProcessStateChanged;
 
                     process.Start();
 
@@ -271,9 +306,174 @@ namespace UniversalOrganiserControls.Unturned3
             {
                 return U3ServerStartResult.AlreadyRunning;
             }
+            
+        }
+
+        public void Stop(int countdown)
+        {
+            initShutdownCountdown(countdown);
+
+            DisableAutoRestartOnceFlag = true;
+            State = U3ServerState.Stopping;
+            if (countdown == 0)
+            {
+                sendCommand("shutdown 0");
+            }
+            else
+            {
+                sendCommand(string.Format("shutdown {0}", countdown));
+            }
+        }
+
+        public void Restart(int countdown)
+        {
+            initShutdownCountdown(countdown);
+            EnableAutoRestartOnceFlag = true;
+            State = U3ServerState.Restarting;
+            if (countdown == 0)
+            {
+                sendCommand("shutdown 0");
+            }
+            else
+            {
+                sendCommand(string.Format("shutdown {0}", countdown));
+            }
+        }
+
+
+        private void initShutdownCountdown(int countdown)
+        {
+            if (countdown != 0)
+            {
+
+                try
+                {
+                    say(string.Format(ServerInformation.ShutdownMessage, countdown.ToString()));
+                }
+                catch (Exception)
+                {
+                    say(ServerInformation.ShutdownMessage);
+                }
+
+                Task.Run(async () =>
+                {
+                    sendCommand(string.Format("shutdown {0}", countdown));
+                    for (int i = countdown; i >= 0; i--)
+                    {
+                        if (i % ServerInformation.ShutdownMessageIntervall == 0)
+                        {
+                            try
+                            {
+                                say(string.Format(ServerInformation.ShutdownMessage, i.ToString()));
+                            }
+                            catch (Exception)
+                            {
+                                say(ServerInformation.ShutdownMessage);
+                            }
+                        }
+                        await Task.Delay(1000);
+                    }
+
+                });
+            }
+        }
+
+        public void Kill(bool restart)
+        {
+            if (process != null)
+            {
+                if (!process.HasExited)
+                {
+                    process.Kill();
+                }
+                if (restart)
+                {
+                    Start();
+                }
+            }
+        }
+
+
+        public void say(string text)
+        {
+            sendCommand("/broadcast " + text);
+        }
+
+        public void sendCommand(string command)
+        {
+
+            if (!RocketBridge.isConnected(this) | !RocketBridge.send(this, string.Format("<command>{0}</command>", command)))
+            {
+                try
+                {
+                    if (process != null && !process.HasExited)
+                    {
+
+                        IntPtr currentFocus = UniversalOrganiserControls.Utils.GetForegroundWindow();
+                        UniversalOrganiserControls.Utils.SetForegroundWindow(process.MainWindowHandle);
+
+
+                        SendKeys.SendWait("{ENTER}");
+                        SendKeys.Flush();
+                        SendKeys.SendWait(command);
+                        SendKeys.Flush();
+
+                        SendKeys.SendWait("{ENTER}");
+                        SendKeys.Flush();
+
+                        UniversalOrganiserControls.Utils.SetForegroundWindow(currentFocus);
+                    }
+
+                }
+                catch (Exception) { }
+            }
 
 
         }
-        
+
+        private void Process_ProcessStateChanged(object sender, ProcessState e)
+        {
+            switch (e)
+            {
+                case ProcessState.Running:
+                    this.State = U3ServerState.Running;
+                    break;
+                case ProcessState.Starting:
+                    this.State = U3ServerState.Starting;
+                    break;
+                case ProcessState.Stoppting:
+                    this.State = U3ServerState.Stopping;
+                    break;
+                case ProcessState.Restarting:
+                    this.State = U3ServerState.Restarting;
+                    break;
+                case ProcessState.Stopped:
+                    this.State = U3ServerState.Stopped;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void updateRocketBridgeConfig()
+        {
+            if (RocketMod & RocketBridge != null)
+            {
+                DirectoryInfo dir = new DirectoryInfo(ServerInformation.ServerDirectory.FullName + "\\Rocket\\Plugins\\rocketbridge");
+                if (!dir.Exists)
+                {
+                    dir.Create();
+                }
+
+                FileInfo file = new FileInfo(dir.FullName + "\\rocketbridge.configuration.xml");
+                if (file.Exists)
+                {
+                    file.Delete();
+                }
+                XmlDocument RocketBridgeXML = new XmlDocument();
+                RocketBridgeXML.LoadXml("<RocketBridgeConfig xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n<port>" + rcon.port.ToString() + "</port>\n</RocketBridgeConfig>");
+                RocketBridgeXML.Save(file.FullName);
+            }
+        }
     }
 }

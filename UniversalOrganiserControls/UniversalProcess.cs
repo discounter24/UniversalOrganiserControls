@@ -129,7 +129,7 @@ namespace UniversalOrganiserControls
 
         }
 
-        public void Stop(uint delay = 0)
+        public void Stop(uint waitTime = 0)
         {
             Task.Run(async () =>
             {
@@ -142,7 +142,7 @@ namespace UniversalOrganiserControls
 
 
                 if (Properties.ShutdownCommand != null) Input(Properties.ShutdownCommand);
-                await Task.Delay((int)(delay * 1000));
+                await Task.Delay((int)(waitTime * 1000));
                 if (!this.HasExited)
                 {
                     this.Kill();

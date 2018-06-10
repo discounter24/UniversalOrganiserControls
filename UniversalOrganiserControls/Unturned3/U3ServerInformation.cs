@@ -9,7 +9,6 @@ namespace UniversalOrganiserControls.Unturned3
 {
     public class U3ServerEngineSettings
     {
-        
 
         public string ArgumentLine { get; set; }
 
