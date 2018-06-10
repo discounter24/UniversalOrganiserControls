@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using UniversalOrganiserControls;
 using UniversalOrganiserControls.Unturned3.Configuration;
 using UniversalOrganiserControls.Unturned3;
+using UniversalOrganiserControls.Unturned3.Workshop;
+
 using System.Xml;
 
 namespace UniversalOrganiserControls.Unturned3
@@ -475,5 +477,29 @@ namespace UniversalOrganiserControls.Unturned3
                 RocketBridgeXML.Save(file.FullName);
             }
         }
+
+        public IEnumerable<U3WorkshopMod> getWorkshopContentMods()
+        {
+            List<U3WorkshopMod> installed = new List<U3WorkshopMod>();
+            DirectoryInfo contentMods = new DirectoryInfo(ServerInformation.ServerDirectory.FullName + "\\Workshop\\Content");
+            if (contentMods.Exists)
+            {
+                foreach (DirectoryInfo ModFile in contentMods.GetDirectories())
+                {
+                    yield return new U3WorkshopMod(ModFile);
+                }
+            }
+            else
+            {
+                contentMods.Create();
+            }
+        }
+
+
+        public U3WorkshopMod getModByName(string name)
+        {
+            return getWorkshopContentMods().First((s) => { return s.Name == name; });
+        }
+
     }
 }
