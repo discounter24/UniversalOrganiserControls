@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
 {
-    class PluginInfo
+    public class RocketPlugin
     {
+
     }
 }

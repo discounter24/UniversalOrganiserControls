@@ -24,6 +24,8 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
         private SteamInstance steam;
         
         private Queue<String> InstallationQueue = new Queue<String>();
+        private String currentID = null;
+
         public bool QueueEmpty
         {
             get
@@ -32,7 +34,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
             }
         }
 
-        private bool Active;
+        private bool Active = true;
 
 
         public U3WorkshopInstaller(U3Server server, FileInfo steamcmd)
@@ -60,12 +62,54 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
 
         private void Steam_SteamOutput(object sender, string text)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("[WorkshopInstallerSteamOutput] " + text);
         }
 
         private void Steam_ModDownloaded(object sender, string folder)
         {
-            throw new NotImplementedException();
+            if (folder == null)
+            {
+                U3WorkshopModInstallationFinished?.Invoke(this, new U3WorkshopModInstalledEventArgs(currentID, "", false, QueueEmpty));
+            }
+            else
+            {
+                U3WorkshopMod mod = new U3WorkshopMod(new DirectoryInfo(folder));
+                try
+                {
+
+                    DirectoryInfo destination = null;
+                    switch (mod.Type)
+                    {
+                        case U3WorkshopModType.Map:
+                            destination = new DirectoryInfo(MapFolder.FullName + "\\" + mod.ID);
+                            break;
+                        case U3WorkshopModType.Content:
+                            destination = new DirectoryInfo(ContentFolder.FullName + "\\" + mod.ID);
+                            break;
+                        default:
+                            U3WorkshopModInstallationFinished?.Invoke(this, new U3WorkshopModInstalledEventArgs(mod.ID, mod.Name, false, QueueEmpty));
+                            return;
+                    }
+
+
+                    if (destination.Exists)
+                    {
+                        U3WorkshopModInstallStateChanged?.Invoke(this, new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.RemoveOld, mod.ID, mod.Name));
+                        mod.Delete();
+                    }
+
+                    U3WorkshopModInstallStateChanged?.Invoke(this, new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.Installing, mod.ID, mod.Name));
+                    UniversalOrganiserControls.Utils.DirectoryCopy(folder, destination.FullName, true);
+                  
+                    U3WorkshopModInstallationFinished?.Invoke(this, new U3WorkshopModInstalledEventArgs(mod.ID, mod.Name, true, QueueEmpty));
+
+                }
+                catch (Exception)
+                {
+                    U3WorkshopModInstallationFinished?.Invoke(this, new U3WorkshopModInstalledEventArgs(mod.ID, mod.Name, false, QueueEmpty));
+                }
+                currentID = null;
+            }
         }
 
         public void installMods(params string[] modid)
@@ -82,20 +126,20 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
             {
                 while (Active)
                 {
-                    if (!QueueEmpty)
+                    if (!QueueEmpty & currentID != null)
                     {
-                        string id = InstallationQueue.Dequeue();
-                        if (id == "-1")
+                        currentID = InstallationQueue.Dequeue();
+                        if (currentID == "-1")
                         {
                             exit();
                         }
 
-                        U3WorkshopModInstallStateChangedEventArgs args = new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.Preparing, id);
+                        U3WorkshopModInstallStateChangedEventArgs args = new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.Preparing, currentID);
                         U3WorkshopModInstallStateChanged?.Invoke(this, args);
 
-                        string modTitle = U3WorkshopMod.getModTitle(id);
+                        string modTitle = U3WorkshopMod.getModTitle(currentID);
 
-                        foreach (U3WorkshopMod Mod in server.getWorkshopContentMods().Where((m) => { return m.ID == id; }))
+                        foreach (U3WorkshopMod Mod in server.getWorkshopContentMods().Where((m) => { return m.ID == currentID; }))
                         {
                             args = new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.RemoveOld, Mod.ID, Mod.Name);
                             U3WorkshopModInstallStateChanged?.Invoke(this, args);
@@ -103,11 +147,11 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
                         }
 
 
-                        args = new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.Installing, id, modTitle);
+                        args = new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.Installing, currentID, modTitle);
                         U3WorkshopModInstallStateChanged?.Invoke(this, args);
 
 
-                        steam.getWorkshopMod("304930", id);
+                        steam.getWorkshopMod("304930", currentID);
                         steam.sendCommand("help");
                     }
                     else

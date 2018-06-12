@@ -76,9 +76,10 @@
     <Compile Include="Unturned3\Configuration\CommandsConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketModConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketPermissionConfig.cs" />
-    <Compile Include="Unturned3\RocketMod\Plugin\Plugin.cs" />
-    <Compile Include="Unturned3\RocketMod\Plugin\PluginInfo.cs" />
-    <Compile Include="Unturned3\RocketMod\Plugin\PluginInstaller.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\RocketPlugin.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginInfo.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginInfoStorage.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginInstaller.cs" />
     <Compile Include="Unturned3\RocketMod\RocketBridgeServer.cs" />
     <Compile Include="Unturned3\RocketMod\RocketModInstaller.cs" />
     <Compile Include="Unturned3\U3Enums.cs" />
