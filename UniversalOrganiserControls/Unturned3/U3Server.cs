@@ -20,8 +20,12 @@ namespace UniversalOrganiserControls.Unturned3
     public class U3Server
     {
 
-        public event ServerStateChanged ServerStateChanged;
-        public event PlayerlistUpdatedEvent PlayerListUpdated;
+        public event EventHandler<U3ServerRenamedArgs> ServerRenamed;
+        public event EventHandler<U3ServerState> ServerStateChanged;
+        public event EventHandler<List<string>> PlayerListUpdated;
+        public event EventHandler<bool> UPnPStateChanged;
+
+
 
         private bool consoleVisibility = true;
         public bool ConsoleVisible
@@ -240,7 +244,30 @@ namespace UniversalOrganiserControls.Unturned3
         private UniversalProcess process;
 
 
-        private RocketBridgeServer RocketBridge { get; set; }
+        private RocketBridgeServer _RocketBridge = null;
+        public RocketBridgeServer RocketBridge
+        {
+            get
+            {
+                return _RocketBridge;
+            }
+            set
+            {
+                if (_RocketBridge!=null)
+                {
+                    _RocketBridge.PlayerListUpdated -= _RocketBridge_PlayerListUpdated;
+                    //_RocketBridge.U3ServerConnected -= _RocketBridge_U3ServerConnected;
+                    //_RocketBridge.U3ServerDisconnected -= _RocketBridge_U3ServerDisconnected;
+                }
+
+                _RocketBridge = value;
+                _RocketBridge.PlayerListUpdated += _RocketBridge_PlayerListUpdated;
+                //_RocketBridge.U3ServerConnected += _RocketBridge_U3ServerConnected;
+                //_RocketBridge.U3ServerDisconnected += _RocketBridge_U3ServerDisconnected;
+            }
+        }
+
+
 
         private bool DisableAutoRestartOnceFlag = false;
         private bool EnableAutoRestartOnceFlag = false;
@@ -478,6 +505,15 @@ namespace UniversalOrganiserControls.Unturned3
             }
         }
 
+
+        private void _RocketBridge_PlayerListUpdated(U3Server u3server, List<string> steamid)
+        {
+            if (u3server.ServerInformation.ServerID.Equals(this.ServerInformation.ServerID))
+            {
+                this.PlayerListUpdated?.Invoke(this, steamid);
+            }
+        }
+
         public IEnumerable<U3WorkshopMod> getWorkshopContentMods()
         {
             List<U3WorkshopMod> installed = new List<U3WorkshopMod>();
@@ -494,7 +530,6 @@ namespace UniversalOrganiserControls.Unturned3
                 contentMods.Create();
             }
         }
-
 
         public U3WorkshopMod getModByName(string name)
         {
