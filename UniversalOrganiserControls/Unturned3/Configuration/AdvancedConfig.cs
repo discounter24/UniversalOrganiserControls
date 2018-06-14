@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace UniversalOrganiserControls.Unturned3.Configuration
 {
@@ -48,9 +50,9 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
             }
         }
 
-        public static AdvancedConfig loadJson(UnturnedInstance instance)
+        public static AdvancedConfig loadJson(U3Server instance)
         {
-            FileInfo configFile = new FileInfo(instance.ServerDirectory.FullName + "\\config.json");
+            FileInfo configFile = new FileInfo(instance.ServerInformation.ServerDirectory.FullName + "\\config.json");
             if (configFile.Exists)
             {
                 return JsonConvert.DeserializeObject<AdvancedConfig>(File.ReadAllText(instance.ServerDirectory.FullName + "\\config.json"));
@@ -234,3 +236,4 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
             public int Timer_Home;
         }
     }
+}

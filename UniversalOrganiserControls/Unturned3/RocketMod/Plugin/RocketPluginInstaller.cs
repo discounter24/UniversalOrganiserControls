@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
 
@@ -19,7 +18,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
         private PluginManager manager;
 
 
-        public RocketPluginInstaller(PluginManager manager)
+        public RocketPluginInstaller(RocketPluginManager manager)
         {
             this.manager = manager;
         }
@@ -109,19 +108,16 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
                 try
                 {
                     dll.CopyTo(manager.PluginFolder.FullName + "\\" + dll.Name, true);
-                    manager.add(new PluginInfo(dll.Name, manager.PluginFolder.FullName, "(unknown)", "(unknown)", new List<string>()));
+                    manager.add(new RocketPluginInfo(dll, "(unknown)", "(unknown)", new List<FileInfo>()));
                     InstallationCompleted?.Invoke();
                 }
-                catch (Exception ex)
-                {
-                    BridgeManager.logNow("Could not install plugin:" + ex.ToString());
-                }
+                catch (Exception)  { }
 
             })).Start();
         }
 
 
-        private void extractZip(ZipFile archive, PluginInfo info)
+        private void extractZip(ZipFile archive, RocketPluginInfo info)
         {
             foreach (ZipEntry entry in archive)
             {

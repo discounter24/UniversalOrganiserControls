@@ -36,8 +36,17 @@
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.5.0, Culture=neutral, PublicKeyToken=9dea7c6e17aa31ff, processorArchitecture=MSIL">
       <HintPath>..\packages\ICSharpCode.SharpZipLib.Patched.0.86.5.1\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Ssdp, Version=1.0.3.0, Culture=neutral, PublicKeyToken=1b9e6d771899610e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Ssdp.1.0.3.0\lib\net45\Mono.Ssdp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Upnp, Version=1.0.3.0, Culture=neutral, PublicKeyToken=5efb3618e038e321, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Upnp.1.0.3.0\lib\net45\Mono.Upnp.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\UnturnedServerOrganiser\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Open.Nat, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f22a6a4582336c76, processorArchitecture=MSIL">
+      <HintPath>..\packages\Open.NAT.2.1.0.0\lib\net45\Open.Nat.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -94,6 +103,11 @@
     <Compile Include="Unturned3\Workshop\U3WorkshopMod.cs" />
     <Compile Include="Unturned3\Workshop\U3WorkshopModInstalledEventArgs.cs" />
     <Compile Include="Unturned3\Workshop\U3WorkshopModInstallStateChangedEventArgs.cs" />
+    <Compile Include="UPnP\Enums.cs" />
+    <Compile Include="UPnP\IUPnPEngine.cs" />
+    <Compile Include="UPnP\Port.cs" />
+    <Compile Include="UPnP\Utils.cs" />
+    <Compile Include="UPnP\WindowsUPnP.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +115,17 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Unturned4 %28top secret%29\NewFolder1\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="NATUPNPLib">
+      <Guid>{1C565858-F302-471E-B409-F180AA4ABEC6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
