@@ -11,6 +11,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
 {
     public class U3WorkshopMod
     {
+
         public static string updateUrl = string.Format("http://dl.unturned-server-organiser.com/mod.php?modURL={0}", url);
         private DirectoryInfo path;
 

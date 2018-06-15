@@ -7,6 +7,7 @@ using UniversalOrganiserControls;
 using UniversalOrganiserControls.Backup;
 using System.IO;
 using UniversalOrganiserControls.Steam;
+using UniversalOrganiserControls.UPnP;
 
 namespace ConsoleTest
 {
@@ -16,6 +17,14 @@ namespace ConsoleTest
 
         static void Main(string[] args)
         {
+
+            IUPnPEngine engine = new WindowsUPnP();
+            Console.WriteLine(engine.Prepare().Result);
+            Console.WriteLine(engine.OpenPort(new UPnPPort(25565, PortType.BOTH, UniversalOrganiserControls.UPnP.Utils.GetLocalIP())).Result);
+
+            Console.ReadKey();
+            /*
+             
             Console.Title = "Unturned engine updater";
 
             SteamInstance.killAll();

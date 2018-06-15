@@ -90,6 +90,7 @@
     <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginInfo.cs" />
     <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginInfoStorage.cs" />
     <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginInstaller.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginManager.cs" />
     <Compile Include="Unturned3\RocketMod\RocketBridgeServer.cs" />
     <Compile Include="Unturned3\RocketMod\RocketModInstaller.cs" />
     <Compile Include="Unturned3\U3Enums.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Unturned3\Workshop\U3WorkshopModInstallStateChangedEventArgs.cs" />
     <Compile Include="UPnP\Enums.cs" />
     <Compile Include="UPnP\IUPnPEngine.cs" />
+    <Compile Include="UPnP\OpenNatUPnP.cs" />
     <Compile Include="UPnP\Port.cs" />
     <Compile Include="UPnP\Utils.cs" />
     <Compile Include="UPnP\WindowsUPnP.cs" />

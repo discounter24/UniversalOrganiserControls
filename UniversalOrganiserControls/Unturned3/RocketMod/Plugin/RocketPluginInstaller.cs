@@ -12,6 +12,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
 {
     public class RocketPluginInstaller
     {
+
         public event RocketPluginDownloaded Downloaded;
         public event RocketPluginInstallationCompleted InstallationCompleted;
 
