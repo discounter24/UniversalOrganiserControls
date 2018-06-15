@@ -18,7 +18,7 @@ namespace UniversalOrganiserControls.UPnP
 
         public WindowsUPnP()
         {
-            State = UPnPSupportState.Unknown;
+            State = UPnPSupportState.NoPrepared;
         }
 
         public Task<UPnPSupportState> Prepare()
@@ -28,9 +28,8 @@ namespace UniversalOrganiserControls.UPnP
                 try
                 {
                     manager = new UPnPNAT();
-                    UPnPPort testPort = new UPnPPort();
-                    testPort.InternalPort = 1;
-
+                    UPnPPort testPort = new UPnPPort(1,PortType.TCP,Utils.GetLocalIP());
+                  
                     PortResult result = await CheckPort(testPort);
                     switch (result)
                     {
@@ -61,7 +60,7 @@ namespace UniversalOrganiserControls.UPnP
                             break;
                         default:
                             //Something went wrong
-                            State = UPnPSupportState.Unknown;
+                            State = UPnPSupportState.NoPrepared;
                             break;
                     }
 
@@ -103,60 +102,11 @@ namespace UniversalOrganiserControls.UPnP
             return Task<List<UPnPPort>>.Run(()=>
             {
                 List<UPnPPort> ports = new List<UPnPPort>();
-
-                IDynamicPortMappingCollection dynMaps = manager.DynamicPortMappingCollection;
-                IStaticPortMappingCollection staticMaps = manager.StaticPortMappingCollection;
-
-
-                if (dynMaps != null)
+                if (manager.StaticPortMappingCollection != null)
                 {
-                    foreach (IDynamicPortMapping mapping in dynMaps)
+                    foreach (IStaticPortMapping mapping in manager.StaticPortMappingCollection)
                     {
-                        UPnPPort port = new UPnPPort();
-
-                        port.Description = mapping.Description;
-                        port.ExternalPort = (UInt16)mapping.ExternalPort;
-                        port.InternalPort = (UInt16)mapping.InternalPort;
-                        switch (mapping.Protocol.ToUpper())
-                        {
-                            case "TCP":
-                                port.Type = PortType.TCP;
-                                break;
-                            case "UDP":
-                                port.Type = PortType.UDP;
-                                break;
-                            default:
-                                port.Type = PortType.BOTH;
-                                break;
-                        }
-                        
-                        ports.Add(port);
-                    }
-                }
-
-                if (staticMaps != null)
-                {
-                    foreach (IStaticPortMapping mapping in staticMaps)
-                    {
-                        UPnPPort port = new UPnPPort();
-                      
-                        port.Description = mapping.Description;
-                        port.ExternalPort = (UInt16)mapping.ExternalPort;
-                        port.InternalPort = (UInt16)mapping.InternalPort;
-                        switch (mapping.Protocol.ToUpper())
-                        {
-                            case "TCP":
-                                port.Type = PortType.TCP;
-                                break;
-                            case "UDP":
-                                port.Type = PortType.UDP;
-                                break;
-                            default:
-                                port.Type = PortType.BOTH;
-                                break;
-                        }
-
-                        ports.Add(port);
+                        ports.Add(convert(mapping));
                     }
                 }
 
@@ -164,11 +114,67 @@ namespace UniversalOrganiserControls.UPnP
             });
         }
 
+        private UPnPPort convert(IStaticPortMapping mapping)
+        {
+            UPnPPort port = new UPnPPort((UInt16)mapping.InternalPort, PortType.TCP, "");
+
+            port.Description = mapping.Description;
+            port.ExternalPort = (UInt16)mapping.ExternalPort;
+            port.InternalPort = (UInt16)mapping.InternalPort;
+            switch (mapping.Protocol.ToUpper())
+            {
+                case "TCP":
+                    port.Type = PortType.TCP;
+                    break;
+                case "UDP":
+                    port.Type = PortType.UDP;
+                    break;
+                default:
+                    port.Type = PortType.BOTH;
+                    break;
+            }
+            return port;
+        }
 
         public Task<PortResult> ClosePort(UPnPPort port)
         {
-            return Task<PortResult>.Run(() =>
+            return Task<PortResult>.Run(async() =>
             {
+                switch (State)
+                {
+                    case UPnPSupportState.Supported:
+                        try
+                        {
+                            List<UPnPPort> ports = await getOpenedPorts();
+
+                            if (!ports.Contains(port))
+                            {
+                                return PortResult.AlreadyClosed;
+                            }
+
+                            IStaticPortMappingCollection maps = manager.StaticPortMappingCollection;
+                            foreach(IStaticPortMapping map in maps)
+                            {
+                                UPnPPort port2 = convert(map);
+                                if (port==port2)
+                                {
+                                    maps.Remove(map.ExternalPort,map.Protocol);
+                                    return PortResult.Closed;
+                                }
+                            }
+                            return PortResult.FailedUnknown;
+                        }
+                        catch (Exception)
+                        {
+                            return PortResult.FailedUnknown;
+                        }
+                    case UPnPSupportState.NotSupported:
+                        return PortResult.EngineNotSupported;
+                    case UPnPSupportState.NoPrepared:
+                        return PortResult.EngineNotPrepared;
+                    default:
+                        break;
+                }
 
                 return PortResult.FailedUnknown;
             });
@@ -176,12 +182,63 @@ namespace UniversalOrganiserControls.UPnP
 
         public Task<PortResult> OpenPort(UPnPPort port)
         {
-            return Task<PortResult>.Run(() =>
+            return Task<PortResult>.Run(async () =>
             {
+                try
+                {
+                    switch (State)
+                    {
+                        case UPnPSupportState.Supported:
 
-                return PortResult.FailedUnknown;
+                            try
+                            {
+                                List<UPnPPort> ports = await getOpenedPorts();
+
+                                if (ports.Contains(port))
+                                {
+                                    return PortResult.AlreadyOpened;
+                                }
+                         
+                                IStaticPortMappingCollection maps = manager.StaticPortMappingCollection;
+                                switch (port.Type)
+                                {
+                                    case PortType.TCP:
+                                        maps.Add(port.ExternalPort, "TCP", port.InternalPort, port.InternalAddress, true, port.Description);
+                                        break;
+                                    case PortType.UDP:
+                                        maps.Add(port.ExternalPort, "UDP", port.InternalPort, port.InternalAddress, true, port.Description);
+                                        break;
+                                    case PortType.BOTH:
+                                        maps.Add(port.ExternalPort, "TCP", port.InternalPort, port.InternalAddress, true, port.Description);
+                                        maps.Add(port.ExternalPort, "UDP", port.InternalPort, port.InternalAddress, true, port.Description);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                return PortResult.Opened;
+
+                            }
+                            catch (Exception)
+                            {
+                                return PortResult.FailedUnknown;
+                            }
+                            
+                        case UPnPSupportState.NotSupported:
+                            return PortResult.EngineNotSupported;
+                        case UPnPSupportState.NoPrepared:
+                            return PortResult.EngineNotPrepared;
+                        default:
+                            return PortResult.FailedUnknown;
+                    }
+                }
+                catch (Exception)
+                {
+                    return PortResult.FailedUnknown;
+                }
+                
             });
         }
+
 
     }
 

@@ -18,7 +18,7 @@ namespace UniversalOrganiserControls.UPnP
     {
         Supported,
         NotSupported,
-        Unknown
+        NoPrepared
     }
 
     public enum PortResult

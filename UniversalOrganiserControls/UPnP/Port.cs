@@ -16,17 +16,17 @@ namespace UniversalOrganiserControls.UPnP
         public UInt16 InternalPort;
         public string InternalAddress;
 
+        public UPnPPort(UInt16 port, PortType type, String InternalAddress)
+        {
+            this.InternalPort = port;
+            this.ExternalPort = port;
+            this.Type = type;
+            this.InternalAddress = InternalAddress;
+        }
 
         public static bool operator ==(UPnPPort a, UPnPPort b)
         {
-            if (a.InternalPort!=b.InternalPort) return false;
-            /*if (a.InternalAddress != b.InternalAddress) return false;
-
-            if (a.Type != b.Type) return false;
-
-            if (a.ExternalPort != b.ExternalPort) return false;
-
-            if (a.Description != b.Description) return false;*/
+            if (a.ExternalPort!=b.ExternalPort) return false;
 
             return true;
         }
