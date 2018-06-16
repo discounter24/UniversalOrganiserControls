@@ -12,11 +12,9 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
 {
     public class RocketPluginInstaller
     {
-
-        public event RocketPluginDownloaded Downloaded;
-        public event RocketPluginInstallationCompleted InstallationCompleted;
-
-        private PluginManager manager;
+       
+      
+        private RocketPluginManager manager;
 
 
         public RocketPluginInstaller(RocketPluginManager manager)
@@ -26,116 +24,155 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
 
         private List<FileInfo> dllFiles = new List<FileInfo>();
 
-        public void install(Uri download, Uri website)
+        public Task<PluginInstallationResult> install(Uri download, Uri website)
         {
-
-            new Thread(() =>
+            return Task.Run(async () =>
             {
-                dllFiles = new List<FileInfo>();
+                List<FileInfo> dependecys = new List<FileInfo>();
+                UniversalWebClient client = new UniversalWebClient();
+                FileInfo tmpFile = new FileInfo(manager.PluginFolder.FullName + "\\plugin.tmp");
+               
+                await client.DownloadFileTaskAsync(download.ToString(), tmpFile.FullName);
 
-                UniversalWebClient downloader = new UniversalWebClient();
-                string tmpFile = manager.PluginFolder + "\\plugin.tmp";
-                downloader.DownloadFile(download, tmpFile);
-                Downloaded?.Invoke();
 
-                ZipFile archive = new ZipFile(tmpFile);
-
+                ZipFile archive = new ZipFile(tmpFile.FullName);
                 if (archive.TestArchive(true))
                 {
                     try
                     {
-                        RocketPluginInfo info = new PluginInfo("", manager.PluginFolder.FullName, "", "", new List<string>());
 
-                        extractZip(archive, info);
-                        info.Website = website.ToString();
-                        info.ClientVersion = PluginInfo.getServerVersion(info.Website);
+                        RocketPlugin plugin = null;
 
-                        foreach (FileInfo dll in dllFiles)
+                        ExtractZipResult res = await extractZip(archive);
+                        List<FileInfo> dependencys = new List<FileInfo>();
+                        FileInfo plFile = null;
+                        foreach (ExtractEntryResult entry in res.entries)
                         {
-                            string dll_name = dll.Name.Remove(dll.Name.Length - dll.Extension.Length).ToLower();
-                            if (dll_name.Contains(website.ToString().ToLower()) | website.ToString().ToLower().Contains(dll_name))
+                            switch (entry.Type)
                             {
-                                info.PluginFile = dll.Name;
+                                case PluginEntryType.Plugin:
+                                    plFile = entry.File;
+                                    break;
+                                case PluginEntryType.Dependency:
+                                    dependencys.Add(entry.File);
+                                    break;
+                                case PluginEntryType.Unknown:
+                                    continue;
+                                default:
+                                    break;
                             }
                         }
+                        plugin = new RocketPlugin(plFile, website.ToString(), plugin.ServerVersion, dependencys);
 
 
                         archive.Close();
-                        manager.add(info);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex.Message == "data is null")
-                        {
-                            FastZip fast = new FastZip();
-                            fast.ExtractZip(tmpFile, manager.PluginFolder.ToString(), "dll");
-                        }
-                        else
-                        {
-                            throw ex;
-                        }
-                    }
+                        manager.add(plugin);
+                        
 
+                        return PluginInstallationResult.OK;
+                    }
+                    catch (Exception)
+                    {
+                        return PluginInstallationResult.Failed;
+                    }
                 }
                 else
                 {
-                    installDll(new FileInfo(tmpFile));
+                    return PluginInstallationResult.FailedNotAZip;
                 }
-                cleanTempFiles();
-                InstallationCompleted?.Invoke();
 
-            }).Start();
+            });
         }
 
-        public void installZip(string zipfile)
+        private void Client_DownloadProgressChanged(object sender, System.Net.DownloadProgressChangedEventArgs e)
         {
-            new Thread(new ThreadStart(delegate
+           
+        }
+
+        public Task<RocketPlugin> installZip(string zipfile)
+        {
+            return Task.Run(async () =>
             {
-                RocketPluginInfo info = new RocketPluginInfo("", manager.PluginFolder.FullName, "", "", new List<string>());
-                ZipFile archive = new ZipFile(zipfile);
-                extractZip(archive, info);
-                archive.Close();
-                manager.add(info);
-                InstallationCompleted?.Invoke();
 
-            })).Start();
+                RocketPlugin plugin = null;
+
+                try
+                {
+                    ZipFile archive = new ZipFile(zipfile);
+                    ExtractZipResult res = await extractZip(archive);
+                    archive.Close();
+
+                    List<FileInfo> dependencys = new List<FileInfo>();
+                    FileInfo plFile = null;
+                    foreach(ExtractEntryResult entry in res.entries)
+                    {
+                        switch (entry.Type)
+                        {
+                            case PluginEntryType.Plugin:
+                                plFile = entry.File;
+                                break;
+                            case PluginEntryType.Dependency:
+                                dependencys.Add(entry.File);
+                                break;
+                            case PluginEntryType.Unknown:
+                                continue;
+                            default:
+                                break;
+                        }
+                    }
+                    plugin = new RocketPlugin(plFile, "", "", dependencys);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+
+                return plugin;
+            });
         }
 
 
-        public void installDll(FileInfo dll)
+        public Task<bool> installDll(FileInfo dll)
         {
-            new Thread(new ThreadStart(delegate
+            return Task.Run(() =>
             {
                 try
                 {
                     dll.CopyTo(manager.PluginFolder.FullName + "\\" + dll.Name, true);
-                    manager.add(new RocketPluginInfo(dll, "(unknown)", "(unknown)", new List<FileInfo>()));
-                    InstallationCompleted?.Invoke();
+                    manager.add(new RocketPlugin(dll, "(unknown)", "(unknown)", new List<FileInfo>()));
+                    return true;
                 }
-                catch (Exception)  { }
-
-            })).Start();
+                catch (Exception)
+                {
+                    return false;
+                }
+            });
         }
 
 
-        private void extractZip(ZipFile archive, RocketPluginInfo info)
+        private Task<ExtractZipResult> extractZip(ZipFile archive)
         {
-            foreach (ZipEntry entry in archive)
+            return Task.Run(async () =>
             {
-                if (entry.IsFile)
+                ExtractZipResult result = new ExtractZipResult();
+
+                foreach (ZipEntry entry in archive)
                 {
-                    if (entry.ExtraData != null)
+                    if (entry.IsFile)
                     {
-                        extractEntry(archive, entry, info);
+                        if (entry.ExtraData != null)
+                        {
+                            result.entries.Add(await extractEntry(archive, entry));
+                        }
+                        else
+                        {
+                            throw new Exception("data is null");
+                        }
                     }
-                    else
-                    {
-                        throw new Exception("data is null");
-                    }
-
                 }
+                return result;
+            });
 
-            }
         }
 
 
@@ -150,28 +187,48 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
         }
 
 
-        private void extractEntry(ZipFile zip, ZipEntry entry, PluginInfo info)
+        private Task<ExtractEntryResult> extractEntry(ZipFile zip, ZipEntry entry)
         {
-
-            if (isDll(entry) & isLibrary(entry))
+            return Task.Run(() =>
             {
-                FileInfo file = new FileInfo(manager.LibrariesFolder + "\\" + getFilename(entry));
-                info.Libraries.Add(file.Name);
 
-                copy(zip, entry, file);
-            }
-            else if (isDll(entry))
-            {
-                FileInfo file = new FileInfo(manager.PluginFolder + "\\" + getFilename(entry));
-                FileInfo inactive = new FileInfo(file.FullName + ".inactive");
-                if (inactive.Exists)
+                ExtractEntryResult result = new ExtractEntryResult();
+
+                if (isDll(entry) & isLibrary(entry))
                 {
-                    inactive.Delete();
+                    FileInfo file = new FileInfo(manager.LibrariesFolder + "\\" + getFilename(entry));
+
+                    copy(zip, entry, file);
+
+                    result.File = file;
+                    result.Type = PluginEntryType.Dependency;
+
+                    return result;
+                }
+                else if (isDll(entry))
+                {
+                    FileInfo file = new FileInfo(manager.PluginFolder + "\\" + getFilename(entry));
+                    FileInfo inactive = new FileInfo(file.FullName + ".inactive");
+                    if (inactive.Exists)
+                    {
+                        inactive.Delete();
+                    }
+
+                    copy(zip, entry, file);
+                    dllFiles.Add(file);
+
+                    result.File = file;
+
+                    return result;
+                }
+                else
+                {
+                    result.Type = PluginEntryType.Unknown;
+                    return result;
                 }
 
-                copy(zip, entry, file);
-                dllFiles.Add(file);
-            }
+            });
+   
         }
 
 
@@ -189,9 +246,6 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
 
             //File.WriteAllBytes(destination.FullName, entry.ExtraData);
         }
-
-
-
         private string getFilename(ZipEntry entry)
         {
             string filename = entry.Name.Split('/')[entry.Name.Split('/').Length - 1];

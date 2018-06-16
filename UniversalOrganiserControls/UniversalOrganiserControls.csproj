@@ -86,9 +86,9 @@
     <Compile Include="Unturned3\Installer\U3SteamInstaller.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketModConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketPermissionConfig.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\Enums.cs" />
     <Compile Include="Unturned3\RocketMod\Plugin\RocketPlugin.cs" />
-    <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginInfo.cs" />
-    <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginInfoStorage.cs" />
+    <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginStorage.cs" />
     <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginInstaller.cs" />
     <Compile Include="Unturned3\RocketMod\Plugin\RocketPluginManager.cs" />
     <Compile Include="Unturned3\RocketMod\RocketBridgeServer.cs" />
@@ -116,7 +116,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Unturned4 %28top secret%29\NewFolder1\" />
+    <Folder Include="Unturned4 %28top secret%29\%28placeholder%29\" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="NATUPNPLib">

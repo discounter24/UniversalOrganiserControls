@@ -14,6 +14,7 @@ using UniversalOrganiserControls.Unturned3;
 using UniversalOrganiserControls.Unturned3.Workshop;
 
 using System.Xml;
+using UniversalOrganiserControls.Unturned3.RocketMod.Plugin;
 
 namespace UniversalOrganiserControls.Unturned3
 {
@@ -237,9 +238,23 @@ namespace UniversalOrganiserControls.Unturned3
             private set
             {
                 _state = value;
+
+                if (value == U3ServerState.Stopped)
+                {
+                    if ((this.ServerInformation.AutomaticRestart & !DisableAutoRestartOnceFlag) | EnableAutoRestartOnceFlag)
+                    {
+                        EnableAutoRestartOnceFlag = false;
+                        DisableAutoRestartOnceFlag = false;
+                        Start();
+                    }
+                }
+                
+
                 ServerStateChanged?.Invoke(this, value);
             }
         }
+
+        public RocketPluginManager PluginManager { get; private set; }
 
         private UniversalProcess process;
 
@@ -256,19 +271,15 @@ namespace UniversalOrganiserControls.Unturned3
                 if (_RocketBridge!=null)
                 {
                     _RocketBridge.PlayerListUpdated -= _RocketBridge_PlayerListUpdated;
-                    //_RocketBridge.U3ServerConnected -= _RocketBridge_U3ServerConnected;
-                    //_RocketBridge.U3ServerDisconnected -= _RocketBridge_U3ServerDisconnected;
                 }
 
                 _RocketBridge = value;
                 _RocketBridge.PlayerListUpdated += _RocketBridge_PlayerListUpdated;
-                //_RocketBridge.U3ServerConnected += _RocketBridge_U3ServerConnected;
-                //_RocketBridge.U3ServerDisconnected += _RocketBridge_U3ServerDisconnected;
             }
         }
 
 
-
+        
         private bool DisableAutoRestartOnceFlag = false;
         private bool EnableAutoRestartOnceFlag = false;
 
@@ -279,6 +290,7 @@ namespace UniversalOrganiserControls.Unturned3
         {
             this.ServerInformation = info;
             this.RocketBridge = rocketBridge;
+            this.PluginManager = new RocketPluginManager(this);
         }
 
         public U3ServerStartResult Start()
@@ -323,6 +335,8 @@ namespace UniversalOrganiserControls.Unturned3
 
                     process.PriorityClass = ServerInformation.HighPriorityProcess ? ProcessPriorityClass.High : ProcessPriorityClass.Normal;
 
+
+                    
 
                     return U3ServerStartResult.OK;
                 }
@@ -535,6 +549,7 @@ namespace UniversalOrganiserControls.Unturned3
         {
             return getWorkshopContentMods().First((s) => { return s.Name == name; });
         }
+
 
     }
 }

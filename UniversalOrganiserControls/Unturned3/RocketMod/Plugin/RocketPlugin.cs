@@ -4,65 +4,146 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Newtonsoft.Json;
+using System.Net;
 
 namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
 {
     public class RocketPlugin
     {
-        public RocketPluginInfo Info;
+
+        private List<string> DependencyLibFiles = new List<string>();
 
 
-        public FileInfo File
+        [JsonIgnore]
+        public IEnumerable<FileInfo> DependencyLibInfos
         {
             get
             {
-                return Info.PluginFileInfo;
+                foreach (string lib in DependencyLibFiles)
+                {
+                    yield return new FileInfo(lib);
+                }
+            }
+        }
+
+
+
+        private string PluginFile = "";
+
+        [JsonIgnore]
+        public FileInfo PluginFileInfo
+        {
+            get
+            {
+                return new FileInfo(PluginFile);
+            }
+        }
+
+        [JsonIgnore]
+        public DirectoryInfo PluginFolder
+        {
+            get
+            {
+                return PluginFileInfo.Directory;
+            }
+        }
+
+
+        public string Website
+        {
+            get; set;
+        }
+
+        [JsonIgnore]
+        public string ServerVersionUri
+        {
+            get
+            {
+                return string.Format("http://rocketmod.unturned-server-organiser.com/plugin.php?getServerVersion&pluginUrl={0}", Website);
+            }
+        }
+
+        [JsonIgnore]
+        public string ServerVersion
+        {
+            get
+            {
+                if (Website == "(unknown)") return "(mirror unknown)";
+
+                try
+                {
+                    WebClient client = new WebClient();
+                    string version = client.DownloadString(ServerVersionUri);
+
+                    return version;
+                }
+                catch (Exception)
+                {
+                    return "(mirror not available)";
+                }
             }
         }
 
         public string ClientVersion
         {
-            get { return Info.ClientVersion == "" ? "(unknown)" : Info.ClientVersion; }
+            get; set;
         }
 
-        public string ServerVersion
+        [JsonIgnore]
+        public string DownloadLink
         {
-            get { return Info.ServerVersion;  }
+            get
+            {
+                if (Website == "(unknown)") return "(mirror unknown)";
+                try
+                {
+                    WebClient client = new WebClient();
+                    string link = client.DownloadString(string.Format("http://rocketmod.unturned-server-organiser.com/plugin.php?getLink&pluginUrl={0}", Website));
+
+                    return link;
+                }
+                catch (WebException)
+                {
+                    return "(download inalid)";
+                }
+                catch
+                {
+                    return "(mirror unavailable)";
+                }
+            }
         }
 
-
+        [JsonIgnore]
         public bool UpdateAvailable
         {
             get { return !ClientVersion.Equals(ServerVersion); }
         }
 
-        public List<FileInfo> DependencyLibs
-        {
-            get { return Info.DependencyLibInfos.ToList<FileInfo>(); }
-        }
-
+        [JsonIgnore]
         public string Name
         {
             get
             {
-                return File.Name.Substring(0, File.Name.Length - (Active ? File.Extension.Length : File.Extension.Length + 4));
+                return PluginFileInfo.Name.Substring(0, PluginFileInfo.Name.Length - (Active ? PluginFileInfo.Extension.Length : PluginFileInfo.Extension.Length + 4));
             }
         }
 
+        [JsonIgnore]
         public bool Active
         {
             get
             {
-                return File.Extension.Equals(".dll");
+                return PluginFileInfo.Extension.Equals(".dll");
             }
             set
             {
                 if (value != Active)
                 {
-                    string newName = File.Directory.FullName + "\\" + Name + (value ? ".dll" : ".dll.inactive");
+                    string newName = PluginFolder.FullName + "\\" + Name + (value ? ".dll" : ".dll.inactive");
 
-                    if (System.IO.File.Exists(newName)) System.IO.File.Delete(newName);
-                    File.MoveTo(newName);
+                    if (File.Exists(newName)) File.Delete(newName);
+                    File.Move(PluginFileInfo.FullName, newName);
                 }
 
             }
@@ -70,9 +151,16 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
 
 
 
-        public RocketPlugin(RocketPluginInfo info)
+        public RocketPlugin(FileInfo pluginFile, String website, String clientVersion, List<FileInfo> dependencyLibs)
         {
-            this.Info = info;
+            this.PluginFile = pluginFile.FullName;
+            this.Website = website == "" ? "(unknown)" : website;
+            this.ClientVersion = clientVersion == "" ? "(unknown)" : clientVersion;
+
+            foreach (FileInfo lib in dependencyLibs)
+            {
+                DependencyLibFiles.Add(lib.FullName);
+            }
         }
 
     }

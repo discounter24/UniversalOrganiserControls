@@ -43,16 +43,16 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
 
         public void reload()
         {
-            loadPlugins(RocketPluginInfoStorage.load(PluginDatabaseFile.FullName));
+            loadPlugins(RocketPluginStorage.load(PluginDatabaseFile.FullName));
         }
 
 
-        private RocketPluginInfo findPluginInfo(string pluginName, RocketPluginInfoStorage storage)
+        private RocketPlugin findPlugin(string pluginName, RocketPluginStorage storage)
         {
-            return storage.PluginUpdateInfos.First(info => info.PluginFileInfo.Name.Equals(pluginName));
+            return storage.Plugins.First(pl => pl.PluginFileInfo.Name.Equals(pluginName));
         }
 
-        private void loadPlugins(RocketPluginInfoStorage storage)
+        private void loadPlugins(RocketPluginStorage storage)
         {
             Plugins.Clear();
 
@@ -68,10 +68,10 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
                 {
                     try
                     {
-                        RocketPluginInfo pinfo = findPluginInfo(pfile.Name, storage);
-                        add(pinfo);
+                        RocketPlugin plugin = findPlugin(pfile.Name, storage);
+                        add(plugin);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         continue;
                     }
@@ -82,10 +82,10 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
                 {
                     try
                     {
-                        RocketPluginInfo pinfo = findPluginInfo(pfile.Name, storage);
-                        add(pinfo);
+                        RocketPlugin plugin = findPlugin(pfile.Name, storage);
+                        add(plugin);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         continue;
                     }
@@ -108,23 +108,21 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
 
         public RocketPlugin getPluginByWebsite(string website)
         {
-            return Plugins.Where(p => p.Info.Website.Equals(website)).DefaultIfEmpty(null).First();
+            return Plugins.Where(p => p.Website.Equals(website)).DefaultIfEmpty(null).First();
         }
 
 
-        public bool add(RocketPluginInfo pinfo)
+        public bool add(RocketPlugin plugin)
         {
             try
             {
-                
-                RocketPlugin p = new RocketPlugin(pinfo);
-                RocketPlugin existingPlugin = getPluginByName(p.Name);
+                RocketPlugin existingPlugin = getPluginByName(plugin.Name);
                 if (existingPlugin != null)
                 {
                     Plugins.Remove(existingPlugin);
                 }
 
-                Plugins.Add(p);
+                Plugins.Add(plugin);
                 saveDatabase();
                 return true;
             }
@@ -141,7 +139,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
         {
             try
             {
-                plugin.File.Delete();
+                plugin.PluginFileInfo.Delete();
                 Plugins.Remove(plugin);
                 saveDatabase();
                 return true;
@@ -158,10 +156,10 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Plugin
         {
             try
             {
-                RocketPluginInfoStorage storage = new RocketPluginInfoStorage();
+                RocketPluginStorage storage = new RocketPluginStorage();
                 foreach (RocketPlugin p in Plugins)
                 {
-                    storage.PluginUpdateInfos.Add(p.Info);
+                    storage.Plugins.Add(p);
                 }
                 return storage.save(PluginDatabaseFile);
             }
