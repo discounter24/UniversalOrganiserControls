@@ -55,7 +55,7 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
             FileInfo configFile = new FileInfo(instance.ServerInformation.ServerDirectory.FullName + "\\config.json");
             if (configFile.Exists)
             {
-                return JsonConvert.DeserializeObject<AdvancedConfig>(File.ReadAllText(instance.ServerDirectory.FullName + "\\config.json"));
+                return JsonConvert.DeserializeObject<AdvancedConfig>(File.ReadAllText(instance.ServerInformation.ServerDirectory.FullName + "\\config.json"));
             }
             else
             {

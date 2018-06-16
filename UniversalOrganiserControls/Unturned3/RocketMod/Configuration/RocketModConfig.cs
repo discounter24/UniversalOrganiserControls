@@ -55,9 +55,9 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
         {
             try
             {
-                DirectoryInfo path = new DirectoryInfo(instance.ServerDirectory.FullName + "\\Rocket\\");
-                FileInfo RocketUnturnedFile = new FileInfo(path.FullName + "\\Rocket.Unturned.config.xml");
-                FileInfo RocketFile = new FileInfo(path.FullName + "\\Rocket.config.xml");
+                //DirectoryInfo path = new DirectoryInfo(instance.ServerDirectory.FullName + "\\Rocket\\");
+                FileInfo RocketUnturnedFile = new FileInfo(rocketFolder + "\\Rocket.Unturned.config.xml");
+                FileInfo RocketFile = new FileInfo(rocketFolder + "\\Rocket.config.xml");
 
                 RocketXML.Save(RocketFile.FullName);
                 RocketUnturnedXML.Save(RocketUnturnedFile.FullName);

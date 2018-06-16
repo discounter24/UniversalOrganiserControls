@@ -58,8 +58,8 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
         {
             try
             {
-                DirectoryInfo path = new DirectoryInfo(instance.ServerDirectory.FullName + "\\Rocket\\");
-                FileInfo RocketPermissionFile = new FileInfo(path.FullName + "\\Permissions.config.xml");
+                
+                FileInfo RocketPermissionFile = new FileInfo(rocketFolder + "\\Permissions.config.xml");
                 
                 RocketPermissionXML.Save(RocketPermissionFile.FullName);
             }

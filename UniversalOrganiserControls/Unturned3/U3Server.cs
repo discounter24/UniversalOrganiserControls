@@ -256,6 +256,23 @@ namespace UniversalOrganiserControls.Unturned3
 
         public RocketPluginManager PluginManager { get; private set; }
 
+        public CommandsConfig ServerConfig
+        {
+            get
+            {
+               
+                return new CommandsConfig(this.ServerInformation.ServerDirectory);
+            }
+        }
+
+        public AdvancedConfig AdvancedConfig
+        {
+            get
+            {
+                return AdvancedConfig.loadJson(this);
+            }
+        }
+
         private UniversalProcess process;
 
 
@@ -514,7 +531,7 @@ namespace UniversalOrganiserControls.Unturned3
                     file.Delete();
                 }
                 XmlDocument RocketBridgeXML = new XmlDocument();
-                RocketBridgeXML.LoadXml("<RocketBridgeConfig xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n<port>" + rcon.port.ToString() + "</port>\n</RocketBridgeConfig>");
+                RocketBridgeXML.LoadXml("<RocketBridgeConfig xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n<port>" + RocketBridge.port.ToString() + "</port>\n</RocketBridgeConfig>");
                 RocketBridgeXML.Save(file.FullName);
             }
         }

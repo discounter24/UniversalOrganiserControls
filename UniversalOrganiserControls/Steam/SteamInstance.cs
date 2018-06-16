@@ -276,7 +276,7 @@ namespace UniversalOrganiserControls.Steam
 
         public bool tryGetSteamLogin()
         {
-           DirectoryInfo localUnturned = Utils.getLocalUnturnedInstallation();
+           DirectoryInfo localUnturned = Unturned3.Utils.Game.getLocalUnturnedInstallation();
             if (localUnturned == null)
             {
                 return false;

@@ -7,7 +7,7 @@ using System.IO;
 
 namespace UniversalOrganiserControls.Unturned3.Configuration
 {
-    class CommandsConfig
+    public class CommandsConfig
     {
         public List<string> content;
         private FileInfo dat;

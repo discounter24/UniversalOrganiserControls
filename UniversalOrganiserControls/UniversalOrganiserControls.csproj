@@ -83,6 +83,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unturned3\Configuration\AdvancedConfig.cs" />
     <Compile Include="Unturned3\Configuration\CommandsConfig.cs" />
+    <Compile Include="Unturned3\Installer\U3OnlineInstaller.cs" />
     <Compile Include="Unturned3\Installer\U3SteamInstaller.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketModConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketPermissionConfig.cs" />
