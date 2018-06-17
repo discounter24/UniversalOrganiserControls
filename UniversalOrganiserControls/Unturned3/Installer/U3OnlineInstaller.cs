@@ -8,5 +8,6 @@ namespace UniversalOrganiserControls.Unturned3.Installer
 {
     public class U3OnlineInstaller
     {
+
     }
 }
