@@ -13,6 +13,7 @@ namespace UniversalOrganiserControls
         protected override WebRequest GetWebRequest(Uri uri)
         {
             HttpWebRequest w = (HttpWebRequest)base.GetWebRequest(uri);
+            w.UserAgent = "UniversalOrganiserControls Version/1.0";
             w.ProtocolVersion = Version.Parse("1.0");
             return (WebRequest)w;
         }
