@@ -15,10 +15,11 @@ namespace UniversalOrganiserControls.Steam
 
         public event AppUpdateStateChanged AppUpdateStateChanged;
         public event AppUpdated AppUpdated;
-
+        
         public event EventHandler<PasswordRequiredArgs> WaitingForPassword;
         public event EventHandler<TwoFactorRequiredArgs> WaitingForTwoFactor;
         public event EventHandler<string> Output;
+
 
         private SteamInstance instance = null;
 

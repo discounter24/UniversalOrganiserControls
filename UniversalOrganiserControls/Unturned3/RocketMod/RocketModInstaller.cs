@@ -121,7 +121,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
                             {
                                 try
                                 {
-                                    var info = new FileInfo(tmpFile);
+                                    FileInfo info = new FileInfo(tmpFile);
                                     if (info.Length > 0)
                                     {
                                         extract(info, gamedir);
@@ -139,6 +139,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
 
                                 waitInstallCompleted.Set();
                             };
+
 
 
                             if (File.Exists(tmpFile)) File.Delete(tmpFile);

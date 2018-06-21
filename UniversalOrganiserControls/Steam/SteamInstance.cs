@@ -104,34 +104,9 @@ namespace UniversalOrganiserControls.Steam
                 catch (Exception) {  }
             });
 
-            /*
-            Task.Run(async () =>
-            {
-                try
-                {
-                    while (!Steam.HasExited)
-                    {
-                        try
-                        {
-                            sendCommand(" ");
-                        }
-                        catch (Exception)
-                        {
-                            await Task.Delay(1000);
-                            continue;
-                        }
-                    }
-                }
-                catch (Exception) { }
-            });
-            */
 
-            //Steam.ErrorDataReceived += Steam_DataReceived;
-            //Steam.OutputDataReceived += Steam_DataReceived;
             Steam.Exited += Steam_Exited;
-
-            //Steam.BeginErrorReadLine();
-            //Steam.BeginOutputReadLine();
+            
 
             waitStartAsync.WaitOne();
         }

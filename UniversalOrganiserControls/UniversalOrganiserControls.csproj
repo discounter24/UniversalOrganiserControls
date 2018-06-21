@@ -11,6 +11,8 @@
     <AssemblyName>UniversalOrganiserControls</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,16 +39,16 @@
       <HintPath>..\packages\ICSharpCode.SharpZipLib.Patched.0.86.5.1\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Ssdp, Version=1.0.3.0, Culture=neutral, PublicKeyToken=1b9e6d771899610e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Ssdp.1.0.3.0\lib\net45\Mono.Ssdp.dll</HintPath>
+      <HintPath>..\..\UnturnedServerOrganiser\packages\Mono.Ssdp.1.0.3.0\lib\net45\Mono.Ssdp.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Upnp, Version=1.0.3.0, Culture=neutral, PublicKeyToken=5efb3618e038e321, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Upnp.1.0.3.0\lib\net45\Mono.Upnp.dll</HintPath>
+      <HintPath>..\..\UnturnedServerOrganiser\packages\Mono.Upnp.1.0.3.0\lib\net45\Mono.Upnp.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\UnturnedServerOrganiser\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Open.Nat, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f22a6a4582336c76, processorArchitecture=MSIL">
-      <HintPath>..\packages\Open.NAT.2.1.0.0\lib\net45\Open.Nat.dll</HintPath>
+      <HintPath>..\..\UnturnedServerOrganiser\packages\Open.NAT.2.1.0.0\lib\net45\Open.Nat.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
