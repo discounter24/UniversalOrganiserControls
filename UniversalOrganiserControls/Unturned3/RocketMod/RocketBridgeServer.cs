@@ -11,7 +11,7 @@ using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using System.IO;
 
-namespace UniversalOrganiserControls.Unturned3
+namespace UniversalOrganiserControls.Unturned3.RocketMod
 {
 
     public delegate void PlayerListUpdatedByRocketEvent(U3Server u3server, List<string> steamid);
@@ -32,8 +32,7 @@ namespace UniversalOrganiserControls.Unturned3
 
         private TcpListener listener;
         private List<ClientConnection> clients = new List<ClientConnection>();
-
-        private Thread _accept;
+        
 
         private Task AcceptionLoop;
         private bool running = true;
@@ -174,7 +173,6 @@ namespace UniversalOrganiserControls.Unturned3
         {
             running = false;
             listener.Stop();
-            _accept.Abort();
         }
 
 

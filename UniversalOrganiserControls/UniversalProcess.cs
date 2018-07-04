@@ -32,16 +32,25 @@ namespace UniversalOrganiserControls
         }
         private ProcessProperties Properties = new ProcessProperties();
 
+      
+    
+
         public UniversalProcess(ProcessProperties properties = null) :  base()
         {
             if (properties != null) this.Properties = properties;
             this.EnableRaisingEvents = true;
-            this.StartInfo.UseShellExecute = false;
-            this.StartInfo.RedirectStandardError = true;
-            this.StartInfo.RedirectStandardOutput = true;
-            this.StartInfo.RedirectStandardInput = true;
+            if (properties.RedirectStd)
+            {
+
+                this.StartInfo.UseShellExecute = false;
+                this.StartInfo.RedirectStandardError = true;
+                this.StartInfo.RedirectStandardOutput = true;
+                this.StartInfo.RedirectStandardInput = true;
+            }
 
             this.StartInfo.CreateNoWindow = this.Properties.HideWindow;
+            this.StartInfo.WindowStyle =  this.Properties.HideWindow ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal;
+
             this.StartInfo.FileName = this.Properties.Executable==null ? this.StartInfo.FileName : this.Properties.Executable.ToString();
 
             this.Exited += (sender, e) => 
@@ -68,8 +77,11 @@ namespace UniversalOrganiserControls
             {
                 this.ProcessState = ProcessState.Starting;
                 base.Start();
-                this.BeginErrorReadLine();
-                this.BeginOutputReadLine();
+                if (Properties.RedirectStd)
+                {
+                    this.BeginErrorReadLine();
+                    this.BeginOutputReadLine();
+                }
                 Task.Run(() =>
                 {
                     Task<bool> wait = this.Properties.StartedCallbackTask;

@@ -20,7 +20,10 @@ namespace UniversalOrganiserControls
             ShutdownCommand = null;
             SendEmptyFinishingCommand = false;
             HideWindow = false;
+            RedirectStd = true;
         }
+
+        public bool RedirectStd { get; set; }
 
         public Task<bool> StartedCallbackTask
         {

@@ -10,23 +10,69 @@ using System.Windows.Forms;
 
 using UniversalOrganiserControls;
 using UniversalOrganiserControls.Unturned3.Configuration;
-using UniversalOrganiserControls.Unturned3;
+using UniversalOrganiserControls.Unturned3.RocketMod;
 using UniversalOrganiserControls.Unturned3.Workshop;
+using UniversalOrganiserControls.Unturned3.UCB;
+using UnturnedConsoleBridge.Networking.Packages;
 
 using System.Xml;
 using UniversalOrganiserControls.Unturned3.RocketMod.Plugin;
+using System.Threading;
 
 namespace UniversalOrganiserControls.Unturned3
 {
     public class U3Server
     {
 
+        public event EventHandler<string> CompleteConsoleOutput;
+        public event EventHandler<string> ConsoleOutput;
+
+        public event EventHandler UCBConnected;
+        public event EventHandler UCBDisconnected;
+
         public event EventHandler<U3ServerRenamedArgs> ServerRenamed;
         public event EventHandler<U3ServerState> ServerStateChanged;
         public event EventHandler<List<string>> PlayerListUpdated;
         public event EventHandler<bool> UPnPStateChanged;
 
+        public IntPtr MainWindowHandle
+        {
+            get
+            {
+                try
+                {
+                    return process.MainWindowHandle;
+                }
+                catch (Exception)
+                {
+                    /*
+                    if (UCBManager.isIdentifed(this))
+                    {
+                        ManualResetEvent wait = new ManualResetEvent(false);
+                        IntPtr ptr = new IntPtr();
+                        Task.Run(() =>
+                        {
+                            UCBManager.PackageReceived += (sender, e) =>
+                              {
+                                  if (e.Server.Equals(this))
+                                  {
+                                      if (e.Package.Header == PackageHeader.MainWindowHandleAnswer)
+                                      {
+                                          ptr = new IntPtr(Convert.ToInt32(((MainWindowHandleAnswerPackage)e.Package).Content));
+                                          wait.Set();
+                                      }
+                                  }
+                              };
+                            UCBManager.sendPackage(this, new SimpleRequestPackage(PackageHeader.MainWindowHandleRequest));
 
+                        });
+                        wait.WaitOne();
+                        return ptr;
+                    }*/
+                    throw;
+                }
+            }
+        }
 
         private bool consoleVisibility = true;
         public bool ConsoleVisible
@@ -37,9 +83,23 @@ namespace UniversalOrganiserControls.Unturned3
             }
             set
             {
-                UniversalOrganiserControls.Utils.ShowWindow(process.MainWindowHandle, 
-                    value ? UniversalOrganiserControls.Utils.WinApiWindowState.Show : UniversalOrganiserControls.Utils.WinApiWindowState.Hide);
-                consoleVisibility = value;
+                try
+                {
+                    //IntPtr handle = process.MainWindowHandle;
+
+                    if (value)
+                    {
+                        UniversalOrganiserControls.Utils.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.Utils.WinApiWindowState.Show);
+                    }
+                    else
+                    {
+                        UniversalOrganiserControls.Utils.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.Utils.WinApiWindowState.Hide);
+                    }
+                    consoleVisibility = value;
+                }
+                catch (Exception)
+                {  }
+
             }
         }
 
@@ -139,6 +199,21 @@ namespace UniversalOrganiserControls.Unturned3
 
         #endregion
 
+        public string LastPID
+        {
+            get
+            {
+                try
+                {
+                    string pid = File.ReadAllText(ServerInformation.ServerDirectory.FullName + "\\server.pid");
+                    return pid;
+                }
+                catch (Exception)
+                {
+                    return "-1";
+                }
+            }
+        }
 
         private List<string> _PlayerList = new List<string>();
         public List<string> PlayerList
@@ -273,7 +348,7 @@ namespace UniversalOrganiserControls.Unturned3
             }
         }
 
-        private UniversalProcess process;
+        private Process process;
 
 
         private RocketBridgeServer _RocketBridge = null;
@@ -291,12 +366,84 @@ namespace UniversalOrganiserControls.Unturned3
                 }
 
                 _RocketBridge = value;
-                _RocketBridge.PlayerListUpdated += _RocketBridge_PlayerListUpdated;
+
+                if (_RocketBridge != null)
+                {
+                    _RocketBridge.PlayerListUpdated += _RocketBridge_PlayerListUpdated;
+                }
+            }
+        }
+
+        private UCBManager _UCBManager = null;
+        public UCBManager UCBManager
+        {
+            get => _UCBManager;
+            set
+            {
+                if (UCBManager != null)
+                {
+                    UCBManager.PackageReceived -= UCBManager_PackageReceived;
+                    UCBManager.ServerIdentified -= UCBManager_ServerIdentified;
+                    UCBManager.AvailableServers.Remove(this);
+                }
+
+                _UCBManager = value;
+
+                if (UCBManager != null)
+                {
+                    UCBManager.PackageReceived += UCBManager_PackageReceived;
+                    UCBManager.ServerIdentified += UCBManager_ServerIdentified;
+                    UCBManager.ServerDisconnected += UCBManager_ServerDisconnected;
+                    UCBManager.AvailableServers.Add(this);
+                }
+            }
+        }
+
+        private void UCBManager_ServerDisconnected(object sender, U3Server e)
+        {
+            UCBDisconnected?.Invoke(this, new EventArgs());
+        }
+
+        private void UCBManager_ServerIdentified(object sender, U3Server e)
+        {
+            if (e==this)
+            {
+                State = U3ServerState.Running;
+                
+                if (process == null)
+                {
+                    int PID = Convert.ToInt32(UCBManager.getConnection(this).PID);
+                    process = Process.GetProcessById(PID);
+                    process.EnableRaisingEvents = true;
+                    process.Exited += (p, e2) => { State = U3ServerState.Stopped; };
+                }
+
+                UCBConnected?.Invoke(this, new EventArgs());
+
             }
         }
 
 
-        
+        private void UCBManager_PackageReceived(object sender, UCBManager.PackageReceivedEventArgs e)
+        {
+            if (e.Package.Header== PackageHeader.GameOutput)
+            {
+                if (e.Server == this)
+                {
+                    GameOutputPackage package = (GameOutputPackage)e.Package;
+                    ConsoleOutput?.Invoke(this, package.Content);
+                }
+            } else if (e.Package.Header==PackageHeader.CompleteConsoleLogAnswer)
+            {
+                if (e.Server==this)
+                {
+                    CompleteConsoleLogPackage package = (CompleteConsoleLogPackage)e.Package;
+                    CompleteConsoleOutput?.Invoke(this, package.Content);
+                    Console.WriteLine(package.Content);
+                }
+            }
+        }
+
         private bool DisableAutoRestartOnceFlag = false;
         private bool EnableAutoRestartOnceFlag = false;
 
@@ -312,7 +459,7 @@ namespace UniversalOrganiserControls.Unturned3
 
         public U3ServerStartResult Start()
         {
-            if (State != U3ServerState.Stopped)
+            if (State == U3ServerState.Stopped)
             {
                 State = U3ServerState.Starting;
 
@@ -329,7 +476,9 @@ namespace UniversalOrganiserControls.Unturned3
 
                     ProcessProperties props = new ProcessProperties();
                     props.Executable = this.ServerInformation.Executable;
-                    props.HideWindow = true;
+                    props.HideWindow = false;
+                    props.RedirectStd = false;
+
                     props.StartedCallbackTask = new Task<bool>(() =>
                     {
                         try
@@ -342,18 +491,21 @@ namespace UniversalOrganiserControls.Unturned3
 
 
                     process = new UniversalProcess(props);
+                  
+                    
                     process.StartInfo.WorkingDirectory = ServerInformation.ServerDirectory.FullName;
                     process.StartInfo.Arguments = String.Format(ServerInformation.ArgumentLine, LanServer ? "lanserver" : "internetserver", ServerInformation.ServerID);
 
-                    process.ProcessStateChanged += Process_ProcessStateChanged;
+                    if (process is UniversalProcess)
+                    {
+                        ((UniversalProcess)process).ProcessStateChanged += Process_ProcessStateChanged;
+                    }
 
                     process.Start();
 
 
                     process.PriorityClass = ServerInformation.HighPriorityProcess ? ProcessPriorityClass.High : ProcessPriorityClass.Normal;
 
-
-                    
 
                     return U3ServerStartResult.OK;
                 }
@@ -367,6 +519,12 @@ namespace UniversalOrganiserControls.Unturned3
                 return U3ServerStartResult.AlreadyRunning;
             }
             
+        }
+
+
+        public void requestServerLog()
+        {
+            UCBManager.sendPackage(this, new SimpleRequestPackage(PackageHeader.CompleteConsoleLogRequest));
         }
 
         public void Stop(int countdown)
@@ -461,34 +619,26 @@ namespace UniversalOrganiserControls.Unturned3
 
         public void sendCommand(string command)
         {
-
-            if (!RocketBridge.isConnected(this) | !RocketBridge.send(this, string.Format("<command>{0}</command>", command)))
+            if (UCBManager == null || !UCBManager.sendCommand(this,command))
             {
-                try
+                if (process != null && !process.HasExited)
                 {
-                    if (process != null && !process.HasExited)
-                    {
 
-                        IntPtr currentFocus = UniversalOrganiserControls.Utils.GetForegroundWindow();
-                        UniversalOrganiserControls.Utils.SetForegroundWindow(process.MainWindowHandle);
+                    IntPtr currentFocus = UniversalOrganiserControls.Utils.GetForegroundWindow();
+                    UniversalOrganiserControls.Utils.SetForegroundWindow(process.MainWindowHandle);
 
 
-                        SendKeys.SendWait("{ENTER}");
-                        SendKeys.Flush();
-                        SendKeys.SendWait(command);
-                        SendKeys.Flush();
+                    SendKeys.SendWait("{ENTER}");
+                    SendKeys.Flush();
+                    SendKeys.SendWait(command);
+                    SendKeys.Flush();
 
-                        SendKeys.SendWait("{ENTER}");
-                        SendKeys.Flush();
+                    SendKeys.SendWait("{ENTER}");
+                    SendKeys.Flush();
 
-                        UniversalOrganiserControls.Utils.SetForegroundWindow(currentFocus);
-                    }
-
+                    UniversalOrganiserControls.Utils.SetForegroundWindow(currentFocus);
                 }
-                catch (Exception) { }
             }
-
-
         }
 
         private void Process_ProcessStateChanged(object sender, ProcessState e)

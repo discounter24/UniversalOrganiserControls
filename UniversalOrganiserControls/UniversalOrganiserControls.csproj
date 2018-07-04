@@ -87,6 +87,7 @@
     <Compile Include="Unturned3\Configuration\CommandsConfig.cs" />
     <Compile Include="Unturned3\Installer\U3OnlineInstaller.cs" />
     <Compile Include="Unturned3\Installer\U3SteamInstaller.cs" />
+    <Compile Include="Unturned3\Item.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketModConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketPermissionConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Plugin\Enums.cs" />
@@ -100,7 +101,9 @@
     <Compile Include="Unturned3\U3Server.cs" />
     <Compile Include="Unturned3\U3ServerEvents.cs" />
     <Compile Include="Unturned3\U3ServerInformation.cs" />
+    <Compile Include="Unturned3\UCB\UCBManager.cs" />
     <Compile Include="Unturned3\Utils\Game.cs" />
+    <Compile Include="Unturned3\Utils\ItemScanner.cs" />
     <Compile Include="Unturned3\Utils\Workshop.cs" />
     <Compile Include="Unturned3\Workshop\Enums.cs" />
     <Compile Include="Unturned3\Workshop\U3WorkshopInstaller.cs" />
@@ -131,6 +134,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\UnturnedServerOrganiser\UnturnedConsoleBridge.Networking\UnturnedConsoleBridge.Networking.csproj">
+      <Project>{ead268aa-59bd-4cf7-8f4f-5033968162e3}</Project>
+      <Name>UnturnedConsoleBridge.Networking</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\UnturnedServerOrganiser\USOCommunicationModule\UnturnedConsoleBridge.csproj">
+      <Project>{46dc92fb-98e9-4fb9-8a85-fa3607e615d0}</Project>
+      <Name>UnturnedConsoleBridge</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

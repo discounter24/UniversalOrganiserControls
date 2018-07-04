@@ -25,7 +25,7 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
         {
 
             if (!serverdir.Exists) serverdir.Create();
-            FileInfo file = new FileInfo(serverdir.FullName + "\\Commands.dat");
+            FileInfo file = new FileInfo(serverdir.FullName + "\\Server\\Commands.dat");
             if (!file.Exists) file.Create().Close();
 
             return file;
@@ -472,6 +472,27 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
                 else
                 {
                     removeSetting("gold");
+                }
+
+            }
+        }
+
+        public bool Whitelisted
+        {
+            get
+            {
+                List<string> settings = getSetting("whitelisted");
+                return (settings.Count != 0);
+            }
+            set
+            {
+                if (value.ToString().ToLower().Equals("true"))
+                {
+                    setSetting("whitelisted", new List<string>());
+                }
+                else
+                {
+                    removeSetting("whitelisted");
                 }
 
             }
