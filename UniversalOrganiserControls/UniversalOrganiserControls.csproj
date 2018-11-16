@@ -31,9 +31,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HtmlAgilityPack, Version=1.8.4.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\..\UnturnedServerOrganiser\packages\HtmlAgilityPack.1.8.4\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.8.8.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\UnturnedServerOrganiser\packages\HtmlAgilityPack.1.8.8\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.5.0, Culture=neutral, PublicKeyToken=9dea7c6e17aa31ff, processorArchitecture=MSIL">
       <HintPath>..\..\UnturnedServerOrganiser\packages\ICSharpCode.SharpZipLib.Patched.0.86.5.1\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -137,13 +140,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\UnturnedServerOrganiser\UnturnedConsoleBridge.Networking\UnturnedConsoleBridge.Networking.csproj">
+    <ProjectReference Include="..\..\UnturnedServerOrganiser\UnturnedConsoleBridge.Networking\UCBNetworking.csproj">
       <Project>{ead268aa-59bd-4cf7-8f4f-5033968162e3}</Project>
-      <Name>UnturnedConsoleBridge.Networking</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\UnturnedServerOrganiser\USOCommunicationModule\UnturnedConsoleBridge.csproj">
-      <Project>{46dc92fb-98e9-4fb9-8a85-fa3607e615d0}</Project>
-      <Name>UnturnedConsoleBridge</Name>
+      <Name>UCBNetworking</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

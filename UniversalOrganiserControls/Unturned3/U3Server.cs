@@ -13,7 +13,7 @@ using UniversalOrganiserControls.Unturned3.Configuration;
 using UniversalOrganiserControls.Unturned3.RocketMod;
 using UniversalOrganiserControls.Unturned3.Workshop;
 using UniversalOrganiserControls.Unturned3.UCB;
-using UnturnedConsoleBridge.Networking.Packages;
+using UCBNetworking.Packages;
 
 using System.Xml;
 using UniversalOrganiserControls.Unturned3.RocketMod.Plugin;
@@ -426,20 +426,20 @@ namespace UniversalOrganiserControls.Unturned3
 
         private void UCBManager_PackageReceived(object sender, UCBManager.PackageReceivedEventArgs e)
         {
-            if (e.Package.Header== PackageHeader.GameOutput)
+            if (e.Package.Header== NetPackageHeader.GameOutputLine)
             {
                 if (e.Server == this)
                 {
-                    GameOutputPackage package = (GameOutputPackage)e.Package;
-                    ConsoleOutput?.Invoke(this, package.Content);
+                    SPackage package = (SPackage)e.Package;
+                    ConsoleOutput?.Invoke(this, package.Message);
                 }
-            } else if (e.Package.Header==PackageHeader.CompleteConsoleLogAnswer)
+            } else if (e.Package.Header == NetPackageHeader.GameOutput)
             {
                 if (e.Server==this)
                 {
-                    CompleteConsoleLogPackage package = (CompleteConsoleLogPackage)e.Package;
-                    CompleteConsoleOutput?.Invoke(this, package.Content);
-                    Console.WriteLine(package.Content);
+                    SPackage package = (SPackage)e.Package;
+                    CompleteConsoleOutput?.Invoke(this, package.Message);
+                    Console.WriteLine(package.Message);
                 }
             }
         }
@@ -524,7 +524,7 @@ namespace UniversalOrganiserControls.Unturned3
 
         public void requestServerLog()
         {
-            UCBManager.sendPackage(this, new SimpleRequestPackage(PackageHeader.CompleteConsoleLogRequest));
+            UCBManager.sendPackage(this, new NetPackage(NetPackageHeader.GameOutputRequest));
         }
 
         public void Stop(int countdown)

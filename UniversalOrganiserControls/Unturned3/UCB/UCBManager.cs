@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnturnedConsoleBridge.Networking.Packages;
-using UnturnedConsoleBridge.Networking;
-using UnturnedConsoleBridge;
+using UCBNetworking.Packages;
+using UCBNetworking;
 
 namespace UniversalOrganiserControls.Unturned3.UCB
 {
@@ -14,8 +13,8 @@ namespace UniversalOrganiserControls.Unturned3.UCB
         public class PackageReceivedEventArgs
         {
             public U3Server Server { get; private set; }
-            public IPackage Package { get; private set; }
-            public PackageReceivedEventArgs(U3Server server, IPackage package)
+            public NetPackage Package { get; private set; }
+            public PackageReceivedEventArgs(U3Server server, NetPackage package)
             {
                 this.Server = server;
                 this.Package = package;
@@ -115,7 +114,7 @@ namespace UniversalOrganiserControls.Unturned3.UCB
         }
 
 
-        public bool sendPackage(U3Server server, IPackage package)
+        public bool sendPackage(U3Server server, NetPackage package)
         {
             if (isIdentifed(server))
             {
@@ -143,31 +142,10 @@ namespace UniversalOrganiserControls.Unturned3.UCB
 
         public bool sendCommand(U3Server server, string command)
         {
-            if (isIdentifed(server))
-            {
-                try
-                {
 
-                    UCBServerConnection con = getConnection(server);
-                    if (con!=null)
-                    {
-                        GameCommandPackage package = new GameCommandPackage();
-                        package.Content = command;
-                        con.send(package);
-                        return true;
-                    }
-                    return false;     
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
+            SPackage package = new SPackage(NetPackageHeader.Command, command);
+            return sendPackage(server,package);
         }
-
+                    
     }
 }
