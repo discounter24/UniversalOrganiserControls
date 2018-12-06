@@ -47,8 +47,8 @@
     <Reference Include="Mono.Upnp, Version=1.0.3.0, Culture=neutral, PublicKeyToken=5efb3618e038e321, processorArchitecture=MSIL">
       <HintPath>..\..\UnturnedServerOrganiser\packages\Mono.Upnp.1.0.3.0\lib\net45\Mono.Upnp.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\UnturnedServerOrganiser\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\UnturnedServerOrganiser\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Open.Nat, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f22a6a4582336c76, processorArchitecture=MSIL">
       <HintPath>..\..\UnturnedServerOrganiser\packages\Open.NAT.2.1.0.0\lib\net45\Open.Nat.dll</HintPath>
@@ -75,6 +75,7 @@
     <Compile Include="Steam\Enums.cs" />
     <Compile Include="Steam\GameInstaller.cs" />
     <Compile Include="Steam\Utils.cs" />
+    <Compile Include="Translation\Translation.cs" />
     <Compile Include="UniversalWebClient.cs">
       <SubType>Component</SubType>
     </Compile>

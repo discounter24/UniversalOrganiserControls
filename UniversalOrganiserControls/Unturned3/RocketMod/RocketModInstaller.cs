@@ -172,7 +172,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
                     }
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     RocketInstallationCompleted?.Invoke(this, RocketModInstallationCompletedType.FailedUnknownException);
                     return RocketModInstallationCompletedType.FailedUnknownException;

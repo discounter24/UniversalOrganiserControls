@@ -17,7 +17,7 @@ namespace UniversalOrganiserControls.Unturned3.Utils
         {
             try
             {
-                return new WebClient().DownloadString(new Uri("http://update.unturned.hosting"));
+                return new WebClient().DownloadString(new Uri("http://dl.unturned-server-organiser.com/unturned/hash.php"));
             }
             catch (Exception)
             {

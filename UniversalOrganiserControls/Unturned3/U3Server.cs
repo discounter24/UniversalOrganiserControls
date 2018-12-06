@@ -491,8 +491,9 @@ namespace UniversalOrganiserControls.Unturned3
 
 
                     process = new UniversalProcess(props);
-                  
-                    
+
+
+                    //process.StartInfo.WorkingDirectory = ServerInformation.GameDirectory.FullName;
                     process.StartInfo.WorkingDirectory = ServerInformation.ServerDirectory.FullName;
                     process.StartInfo.Arguments = String.Format(ServerInformation.ArgumentLine, LanServer ? "lanserver" : "internetserver", ServerInformation.ServerID);
 
@@ -506,6 +507,7 @@ namespace UniversalOrganiserControls.Unturned3
 
                     process.PriorityClass = ServerInformation.HighPriorityProcess ? ProcessPriorityClass.High : ProcessPriorityClass.Normal;
 
+                    if (UCBManager == null) State = U3ServerState.Running;
 
                     return U3ServerStartResult.OK;
                 }
