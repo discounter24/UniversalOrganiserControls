@@ -24,6 +24,8 @@ namespace UniversalOrganiserControls.Unturned3
 
         public bool HighPriorityProcess { get; set; }
 
+        public bool StartHidden { get; set; }
+
         public string ServerID
         {
             get;set;

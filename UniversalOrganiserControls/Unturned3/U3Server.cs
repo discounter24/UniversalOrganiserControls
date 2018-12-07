@@ -496,6 +496,12 @@ namespace UniversalOrganiserControls.Unturned3
                     //process.StartInfo.WorkingDirectory = ServerInformation.GameDirectory.FullName;
                     process.StartInfo.WorkingDirectory = ServerInformation.ServerDirectory.FullName;
                     process.StartInfo.Arguments = String.Format(ServerInformation.ArgumentLine, LanServer ? "lanserver" : "internetserver", ServerInformation.ServerID);
+                  
+
+                    if (ServerInformation.StartHidden)
+                    {
+                        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    }
 
                     if (process is UniversalProcess)
                     {
@@ -504,6 +510,7 @@ namespace UniversalOrganiserControls.Unturned3
 
                     process.Start();
 
+                    
 
                     process.PriorityClass = ServerInformation.HighPriorityProcess ? ProcessPriorityClass.High : ProcessPriorityClass.Normal;
 

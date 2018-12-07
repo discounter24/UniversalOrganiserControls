@@ -26,6 +26,7 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
 
             if (!serverdir.Exists) serverdir.Create();
             FileInfo file = new FileInfo(serverdir.FullName + "\\Server\\Commands.dat");
+            if (!file.Directory.Exists) file.Directory.Create();
             if (!file.Exists) file.Create().Close();
 
             return file;
