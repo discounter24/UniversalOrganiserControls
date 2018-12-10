@@ -141,9 +141,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\UnturnedServerOrganiser\UnturnedConsoleBridge.Networking\UCBNetworking.csproj">
+    <ProjectReference Include="..\..\UnturnedServerOrganiser\UnturnedConsoleBridge.Networking\OrganiserNetworking.csproj">
       <Project>{ead268aa-59bd-4cf7-8f4f-5033968162e3}</Project>
-      <Name>UCBNetworking</Name>
+      <Name>OrganiserNetworking</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

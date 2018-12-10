@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UCBNetworking.Packages;
-using UCBNetworking;
+using OrganiserNetworking.Packages;
+using OrganiserNetworking;
 
 namespace UniversalOrganiserControls.Unturned3.UCB
 {
@@ -13,8 +13,8 @@ namespace UniversalOrganiserControls.Unturned3.UCB
         public class PackageReceivedEventArgs
         {
             public U3Server Server { get; private set; }
-            public NetPackage Package { get; private set; }
-            public PackageReceivedEventArgs(U3Server server, NetPackage package)
+            public OPackage Package { get; private set; }
+            public PackageReceivedEventArgs(U3Server server, OPackage package)
             {
                 this.Server = server;
                 this.Package = package;
@@ -114,7 +114,7 @@ namespace UniversalOrganiserControls.Unturned3.UCB
         }
 
 
-        public bool sendPackage(U3Server server, NetPackage package)
+        public bool sendPackage(U3Server server, OPackage package)
         {
             if (isIdentifed(server))
             {
@@ -143,7 +143,7 @@ namespace UniversalOrganiserControls.Unturned3.UCB
         public bool sendCommand(U3Server server, string command)
         {
 
-            SPackage package = new SPackage(NetPackageHeader.Command, command);
+            StringPackage package = new StringPackage(NetPackageHeader.Command, command);
             return sendPackage(server,package);
         }
                     

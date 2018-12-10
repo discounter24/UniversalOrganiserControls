@@ -13,7 +13,7 @@ using UniversalOrganiserControls.Unturned3.Configuration;
 using UniversalOrganiserControls.Unturned3.RocketMod;
 using UniversalOrganiserControls.Unturned3.Workshop;
 using UniversalOrganiserControls.Unturned3.UCB;
-using UCBNetworking.Packages;
+using OrganiserNetworking.Packages;
 
 using System.Xml;
 using UniversalOrganiserControls.Unturned3.RocketMod.Plugin;
@@ -430,14 +430,14 @@ namespace UniversalOrganiserControls.Unturned3
             {
                 if (e.Server == this)
                 {
-                    SPackage package = (SPackage)e.Package;
+                    StringPackage package = (StringPackage)e.Package;
                     ConsoleOutput?.Invoke(this, package.Message);
                 }
             } else if (e.Package.Header == NetPackageHeader.GameOutput)
             {
                 if (e.Server==this)
                 {
-                    SPackage package = (SPackage)e.Package;
+                    StringPackage package = (StringPackage)e.Package;
                     CompleteConsoleOutput?.Invoke(this, package.Message);
                     Console.WriteLine(package.Message);
                 }
@@ -533,7 +533,7 @@ namespace UniversalOrganiserControls.Unturned3
 
         public void requestServerLog()
         {
-            UCBManager.sendPackage(this, new NetPackage(NetPackageHeader.GameOutputRequest));
+            UCBManager.sendPackage(this, new OPackage(NetPackageHeader.GameOutputRequest));
         }
 
         public void Stop(int countdown)
