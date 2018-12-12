@@ -20,10 +20,11 @@ namespace UniversalOrganiserControls.Backup
             Reload();
         }
 
-        public BackupProcess Create(string source, string identifier, string game = "")
+        public BackupProcess Create(string source, string identifier = "", string game = "", string subgame = "")
         {
             BackupProcess process = new BackupProcess();
-            process.CreateBackup(new BackupInfo(game, identifier), source, Target.FullName);
+            BackupInfo info = new BackupInfo(game, subgame, identifier);
+            process.CreateBackup(info, source, Target.FullName);
             return process;
         }
         
@@ -34,7 +35,9 @@ namespace UniversalOrganiserControls.Backup
             {
                 try
                 {
-                    Backups.Add(new BackupPackage(file.Directory,BackupInfo.read(file.FullName)));
+                    BackupInfo info = BackupInfo.read(file.FullName);
+                    BackupPackage package = new BackupPackage(file.Directory, info);
+                    Backups.Add(package);
                 }
                 catch (Exception)
                 {

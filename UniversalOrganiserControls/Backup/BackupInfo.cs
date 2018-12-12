@@ -14,66 +14,65 @@ namespace UniversalOrganiserControls.Backup
         public string Hash
         {
             get;
-            private set;
+            set;
         }
         public string GameName
         {
             get;
-            private set;
+            set;
         }
+
+        public string SubGame
+        {
+            get;
+            set;
+        }
+
         public string CustomIdentifier
         {
             get;
-            private set;
+            set;
         }
+
         public DateTime Created
         {
             get;
-            private set;
+            set;
         }
-        
+
+
         [JsonIgnore]
         public BackupPackage Data { get; private set; }
 
 
-        public BackupInfo(string gameName, string customIdentifier = "")
+        public BackupInfo(string gameName, string subgame, string customIdentifier = "")
         {
             this.Created = DateTime.Now;
             this.GameName = gameName;
             this.CustomIdentifier = customIdentifier;
+            this.SubGame = subgame;
 
-            string clearName = GameName + ";" + CustomIdentifier + ";" + Created.ToString();
-            this.Hash = GetHashString(clearName);
+            string clearName = GameName + ";" + CustomIdentifier + ";" + Created.ToString() + ";" + subgame;
+            this.Hash = UtilsGeneral.GetHashString(clearName);
         }
 
-        private static byte[] GetHash(string inputString)
-        {
-            HashAlgorithm algorithm = SHA256.Create();
-            return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
-        }
 
-        private static string GetHashString(string inputString)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (byte b in GetHash(inputString))
-                sb.Append(b.ToString("X2"));
-
-            return sb.ToString();
-        }
 
 
         public static BackupInfo read(string file)
         {
             try
             {
-                BackupInfo info = null;
                 string content = File.ReadAllText(file);
                 JsonSerializerSettings jsonSettings = new JsonSerializerSettings();
                 jsonSettings.NullValueHandling = NullValueHandling.Ignore;
                 jsonSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
-                info = JsonConvert.DeserializeObject<BackupInfo>(content);
+
+                BackupInfo info = JsonConvert.DeserializeObject<BackupInfo>(content);
+
                 DirectoryInfo dir = new DirectoryInfo(new FileInfo(file).Directory.FullName);
                 info.Data = new BackupPackage(dir, info);
+
                 return info;
             }
             catch (Exception)

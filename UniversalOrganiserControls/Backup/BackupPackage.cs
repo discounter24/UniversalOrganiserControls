@@ -33,8 +33,7 @@ namespace UniversalOrganiserControls.Backup
                 _package = value;
             }
         }
-
-
+        
 
         public BackupPackage(DirectoryInfo folder, BackupInfo info)
         {
@@ -54,10 +53,15 @@ namespace UniversalOrganiserControls.Backup
         {
             try
             {
-                this.Package.Delete();
+                FileInfo pack = Package;
+                pack.Delete();
+
+                FileInfo info = new FileInfo(pack.Directory.FullName + "\\" + BackupInfo.Hash + ".bck");
+                info.Delete();
+
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }

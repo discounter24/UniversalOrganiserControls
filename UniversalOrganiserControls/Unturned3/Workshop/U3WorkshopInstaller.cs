@@ -99,7 +99,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
                     }
 
                     U3WorkshopModInstallStateChanged?.Invoke(this, new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.Installing, mod.ID, mod.Name));
-                    UniversalOrganiserControls.Utils.DirectoryCopy(folder, destination.FullName, true);
+                    UniversalOrganiserControls.UtilsGeneral.DirectoryCopy(folder, destination.FullName, true);
                   
                     U3WorkshopModInstallationFinished?.Invoke(this, new U3WorkshopModInstalledEventArgs(mod.ID, mod.Name, true, QueueEmpty));
 

@@ -124,7 +124,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
                                     FileInfo info = new FileInfo(tmpFile);
                                     if (info.Length > 0)
                                     {
-                                        extract(info, gamedir);
+                                        UtilsGeneral.extractZip(info, gamedir);
                                         LocalVersion = v;
                                     }
                                     else
@@ -183,29 +183,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
         }
 
 
-        private void extract(FileInfo file, DirectoryInfo dest)
-        {
-            if (!dest.Exists) dest.Create();
-            
-            foreach (var Entry in ZipFile.OpenRead(file.FullName).Entries)
-            {
-                try
-                {
-                    string dir = Path.GetFullPath(Path.Combine(dest.FullName, Entry.FullName));
 
-                    if (!Directory.Exists(Path.GetDirectoryName(dir)))
-                    {
-                        Directory.CreateDirectory(dir);
-                    }
-
-                    if (Entry.Name != "")
-                    {
-                        Entry.ExtractToFile((dir), true);
-                    }
-                }
-                catch (Exception) { }
-            }
-        }
 
 
 

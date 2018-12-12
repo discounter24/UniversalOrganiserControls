@@ -6,10 +6,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO.Compression;
+using System.Security.Cryptography;
 
 namespace UniversalOrganiserControls
 {
-    public static class Utils
+    public static class UtilsGeneral
     {
 
         [DllImport("user32.dll")]
@@ -56,6 +58,35 @@ namespace UniversalOrganiserControls
             Maximize = 3, ShowNormalNoActivate = 4, Show = 5,
             Minimize = 6, ShowMinNoActivate = 7, ShowNoActivate = 8,
             Restore = 9, ShowDefault = 10, ForceMinimized = 11
+        }
+
+        public static string GetMD5HashOfFile(string filename)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    var hash = md5.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
+        }
+
+        public static byte[] GetHash(string inputString)
+        {
+            HashAlgorithm algorithm = SHA256.Create();
+            return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+        }
+
+        public static string GetHashString(string inputString)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in GetHash(inputString))
+            {
+                sb.Append(b.ToString("X2"));
+            }
+
+            return sb.ToString();
         }
 
         public static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
@@ -124,6 +155,30 @@ namespace UniversalOrganiserControls
             catch (Exception ex)
             {
                 throw new Exception("Could not delete: " + target_dir + "\n" + ex.ToString(), ex);
+            }
+        }
+
+        public static void extractZip(FileInfo file, DirectoryInfo dest)
+        {
+            if (!dest.Exists) dest.Create();
+
+            foreach (var Entry in ZipFile.OpenRead(file.FullName).Entries)
+            {
+                try
+                {
+                    string dir = Path.GetFullPath(Path.Combine(dest.FullName, Entry.FullName));
+
+                    if (!Directory.Exists(Path.GetDirectoryName(dir)))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
+
+                    if (Entry.Name != "")
+                    {
+                        Entry.ExtractToFile((dir), true);
+                    }
+                }
+                catch (Exception) { }
             }
         }
 

@@ -93,6 +93,7 @@
     <Compile Include="Unturned3\Installer\U3OnlineInstaller.cs" />
     <Compile Include="Unturned3\Installer\U3SteamInstaller.cs" />
     <Compile Include="Unturned3\Item.cs" />
+    <Compile Include="Unturned3\Modules\ModuleInstaller.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketModConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Configuration\RocketPermissionConfig.cs" />
     <Compile Include="Unturned3\RocketMod\Plugin\Enums.cs" />

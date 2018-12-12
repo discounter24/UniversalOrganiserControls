@@ -89,11 +89,11 @@ namespace UniversalOrganiserControls.Unturned3
 
                     if (value)
                     {
-                        UniversalOrganiserControls.Utils.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.Utils.WinApiWindowState.Show);
+                        UniversalOrganiserControls.UtilsGeneral.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.UtilsGeneral.WinApiWindowState.Show);
                     }
                     else
                     {
-                        UniversalOrganiserControls.Utils.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.Utils.WinApiWindowState.Hide);
+                        UniversalOrganiserControls.UtilsGeneral.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.UtilsGeneral.WinApiWindowState.Hide);
                     }
                     consoleVisibility = value;
                 }
@@ -139,6 +139,13 @@ namespace UniversalOrganiserControls.Unturned3
                 {
                     return config.Server.BattlEye_Secure;
                 }
+            }
+
+            set
+            {
+                AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
+                config.Server.BattlEye_Secure = value;
+                File.WriteAllText(ServerInformation.ServerDirectory + "\\config.json", config.getJson());
             }
         }
 
@@ -267,6 +274,12 @@ namespace UniversalOrganiserControls.Unturned3
                     return config.Server.VAC_Secure;
                 }
             }
+            set
+            {
+                AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
+                config.Server.VAC_Secure = value;
+                File.WriteAllText(ServerInformation.ServerDirectory + "\\config.json", config.getJson());
+            }
         }
 
         public bool AutoStart
@@ -274,14 +287,18 @@ namespace UniversalOrganiserControls.Unturned3
             get { return new FileInfo(ServerInformation.ServerDirectory.FullName + "\\autostart.uso").Exists; }
             set
             {
-                FileInfo insecure = new FileInfo(ServerInformation.ServerDirectory.FullName + "\\autostart.uso");
+                FileInfo autostart = new FileInfo(ServerInformation.ServerDirectory.FullName + "\\autostart.uso");
+                if (!autostart.Directory.Exists)
+                {
+                    autostart.Directory.Create();
+                } 
                 if (value)
                 {
-                    if (!insecure.Exists) insecure.Create().Close();
+                    if (!autostart.Exists) autostart.Create().Close();
                 }
                 else
                 {
-                    if (insecure.Exists) insecure.Delete();
+                    if (autostart.Exists) autostart.Delete();
                 }
             }
         }
@@ -292,6 +309,10 @@ namespace UniversalOrganiserControls.Unturned3
             set
             {
                 FileInfo lan = new FileInfo(ServerInformation.ServerDirectory.FullName + "\\lan.uso");
+                if (!lan.Directory.Exists)
+                {
+                    lan.Directory.Create();
+                }
                 if (value)
                 {
                     if (!lan.Exists) lan.Create().Close();
@@ -633,8 +654,8 @@ namespace UniversalOrganiserControls.Unturned3
                 if (process != null && !process.HasExited)
                 {
 
-                    IntPtr currentFocus = UniversalOrganiserControls.Utils.GetForegroundWindow();
-                    UniversalOrganiserControls.Utils.SetForegroundWindow(process.MainWindowHandle);
+                    IntPtr currentFocus = UniversalOrganiserControls.UtilsGeneral.GetForegroundWindow();
+                    UniversalOrganiserControls.UtilsGeneral.SetForegroundWindow(process.MainWindowHandle);
 
 
                     SendKeys.SendWait("{ENTER}");
@@ -645,7 +666,7 @@ namespace UniversalOrganiserControls.Unturned3
                     SendKeys.SendWait("{ENTER}");
                     SendKeys.Flush();
 
-                    UniversalOrganiserControls.Utils.SetForegroundWindow(currentFocus);
+                    UniversalOrganiserControls.UtilsGeneral.SetForegroundWindow(currentFocus);
                 }
             }
         }
