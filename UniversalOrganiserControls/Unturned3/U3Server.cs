@@ -130,22 +130,35 @@ namespace UniversalOrganiserControls.Unturned3
         {
             get
             {
-                AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
-                if (config == null)
+                try
+                {
+                    AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
+                    if (config == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return config.Server.BattlEye_Secure;
+                    }
+                }
+                catch (Exception)
                 {
                     return true;
                 }
-                else
-                {
-                    return config.Server.BattlEye_Secure;
-                }
+
             }
 
             set
             {
-                AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
-                config.Server.BattlEye_Secure = value;
-                File.WriteAllText(ServerInformation.ServerDirectory + "\\config.json", config.getJson());
+                try
+                {
+                    AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
+                    config.Server.BattlEye_Secure = value;
+                    File.WriteAllText(ServerInformation.ServerDirectory + "\\config.json", config.getJson());
+                }
+                catch (Exception) {}
+
             }
         }
 
@@ -264,21 +277,33 @@ namespace UniversalOrganiserControls.Unturned3
         {
             get
             {
-                AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
-                if (config == null)
+                try
+                {
+                    AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
+                    if (config == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return config.Server.VAC_Secure;
+                    }
+                }
+                catch (Exception)
                 {
                     return true;
                 }
-                else
-                {
-                    return config.Server.VAC_Secure;
-                }
+
             }
             set
             {
-                AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
-                config.Server.VAC_Secure = value;
-                File.WriteAllText(ServerInformation.ServerDirectory + "\\config.json", config.getJson());
+                try
+                {
+                    AdvancedConfig config = AdvancedConfig.loadJson(ServerInformation.ServerDirectory + "\\config.json");
+                    config.Server.VAC_Secure = value;
+                    File.WriteAllText(ServerInformation.ServerDirectory + "\\config.json", config.getJson());
+                }
+                catch (Exception)   { }
             }
         }
 
