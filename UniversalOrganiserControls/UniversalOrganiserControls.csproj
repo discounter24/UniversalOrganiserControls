@@ -112,8 +112,10 @@
     <Compile Include="Unturned3\Utils\ItemScanner.cs" />
     <Compile Include="Unturned3\Utils\Workshop.cs" />
     <Compile Include="Unturned3\Workshop\Enums.cs" />
+    <Compile Include="Unturned3\Workshop\U3WorkshopAutoUpdaterConfig.cs" />
     <Compile Include="Unturned3\Workshop\U3WorkshopInstaller.cs" />
     <Compile Include="Unturned3\Workshop\U3WorkshopMod.cs" />
+    <Compile Include="Unturned3\Workshop\U3WorkshopMod_Managed.cs" />
     <Compile Include="Unturned3\Workshop\U3WorkshopModInstalledEventArgs.cs" />
     <Compile Include="Unturned3\Workshop\U3WorkshopModInstallStateChangedEventArgs.cs" />
     <Compile Include="UPnP\Enums.cs" />

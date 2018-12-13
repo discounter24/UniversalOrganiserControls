@@ -89,11 +89,11 @@ namespace UniversalOrganiserControls.Unturned3
 
                     if (value)
                     {
-                        UniversalOrganiserControls.UtilsGeneral.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.UtilsGeneral.WinApiWindowState.Show);
+                        UtilsGeneral.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.UtilsGeneral.WinApiWindowState.Show);
                     }
                     else
                     {
-                        UniversalOrganiserControls.UtilsGeneral.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.UtilsGeneral.WinApiWindowState.Hide);
+                        UtilsGeneral.ShowWindow(process.MainWindowHandle, UniversalOrganiserControls.UtilsGeneral.WinApiWindowState.Hide);
                     }
                     consoleVisibility = value;
                 }
@@ -225,7 +225,7 @@ namespace UniversalOrganiserControls.Unturned3
             {
                 try
                 {
-                    string pid = File.ReadAllText(ServerInformation.ServerDirectory.FullName + "\\server.pid");
+                    string pid = File.ReadAllText(ServerInformation.ServerDirectory.FullName + "\\UCB\\server.pid");
                     return pid;
                 }
                 catch (Exception)
@@ -268,6 +268,66 @@ namespace UniversalOrganiserControls.Unturned3
                 catch (Exception)
                 {
                     return "(not available)";
+                }
+
+            }
+        }
+
+
+        public IEnumerable<string> AvailableMaps
+        {
+            get
+            {
+                DirectoryInfo standardMaps = new DirectoryInfo(ServerInformation.ServerDirectory.Parent.Parent.FullName + "\\Maps\\");
+
+
+                if (!standardMaps.Exists)
+                {
+                    try
+                    {
+                        standardMaps.Create();
+                    }
+                    catch (Exception ex) { }
+                }
+                else
+                {
+                    foreach (DirectoryInfo map in standardMaps.GetDirectories())
+                    {
+                        yield return map.Name;
+                    }
+                }
+                
+                DirectoryInfo workshopMaps1 = new DirectoryInfo(ServerInformation.ServerDirectory.Parent.Parent.FullName + "\\Bundles\\Workshop\\Maps");
+                if (workshopMaps1.Exists)
+                {
+                    foreach (DirectoryInfo workshopmapMod in workshopMaps1.GetDirectories())
+                    {
+                        foreach (DirectoryInfo map in workshopmapMod.GetDirectories())
+                        {
+                            yield return map.Name;
+                        }
+                    }
+
+                }
+                else
+                {
+                    try
+                    {
+                        workshopMaps1.Create();
+                    } catch (Exception) { }
+                }
+
+                DirectoryInfo autoUpdateMaps = new DirectoryInfo(ServerInformation.ServerDirectory.FullName + "Workshop\\Steam\\content\\304930");
+                if (autoUpdateMaps.Exists)
+                {
+                    foreach (DirectoryInfo anyMod in autoUpdateMaps.GetDirectories())
+                    {
+                        FileInfo mapMeta = new FileInfo(anyMod.FullName + "\\Map.meta");
+                        if (mapMeta.Exists && anyMod.GetDirectories().Length > 0)
+                        {
+                            yield return anyMod.GetDirectories()[0].Name;
+                        }
+                    }
                 }
 
             }
@@ -379,20 +439,20 @@ namespace UniversalOrganiserControls.Unturned3
 
         public CommandsConfig ServerConfig
         {
-            get
-            {
-               
-                return new CommandsConfig(this.ServerInformation.ServerDirectory);
-            }
+            get => new CommandsConfig(this.ServerInformation.ServerDirectory);
         }
 
         public AdvancedConfig AdvancedConfig
         {
-            get
-            {
-                return AdvancedConfig.loadJson(this);
-            }
+            get => AdvancedConfig.loadJson(this);
         }
+
+        public U3WorkshopAutoUpdaterConfig WorkshopAutoUpdaterConfig
+        {
+            get => new U3WorkshopAutoUpdaterConfig(this);
+        }
+
+
 
         private Process process;
 
@@ -539,8 +599,8 @@ namespace UniversalOrganiserControls.Unturned3
                     process = new UniversalProcess(props);
 
 
-                    //process.StartInfo.WorkingDirectory = ServerInformation.GameDirectory.FullName;
-                    process.StartInfo.WorkingDirectory = ServerInformation.ServerDirectory.FullName;
+                    process.StartInfo.WorkingDirectory = ServerInformation.GameDirectory.FullName;
+
                     process.StartInfo.Arguments = String.Format(ServerInformation.ArgumentLine, LanServer ? "lanserver" : "internetserver", ServerInformation.ServerID);
                   
 
@@ -750,15 +810,15 @@ namespace UniversalOrganiserControls.Unturned3
             }
         }
 
-        public IEnumerable<U3WorkshopMod> getWorkshopContentMods()
+        public IEnumerable<U3WorkshopMod_Managed> getWorkshopContentMods()
         {
-            List<U3WorkshopMod> installed = new List<U3WorkshopMod>();
+            List<U3WorkshopMod_Managed> installed = new List<U3WorkshopMod_Managed>();
             DirectoryInfo contentMods = new DirectoryInfo(ServerInformation.ServerDirectory.FullName + "\\Workshop\\Content");
             if (contentMods.Exists)
             {
                 foreach (DirectoryInfo ModFile in contentMods.GetDirectories())
                 {
-                    yield return new U3WorkshopMod(ModFile);
+                    yield return new U3WorkshopMod_Managed(ModFile);
                 }
             }
             else
@@ -767,7 +827,7 @@ namespace UniversalOrganiserControls.Unturned3
             }
         }
 
-        public U3WorkshopMod getModByName(string name)
+        public U3WorkshopMod_Managed getModByName(string name)
         {
             return getWorkshopContentMods().First((s) => { return s.Name == name; });
         }

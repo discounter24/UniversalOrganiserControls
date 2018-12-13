@@ -73,7 +73,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
             }
             else
             {
-                U3WorkshopMod mod = new U3WorkshopMod(new DirectoryInfo(folder));
+                U3WorkshopMod_Managed mod = new U3WorkshopMod_Managed(new DirectoryInfo(folder));
                 try
                 {
 
@@ -139,7 +139,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
 
                         string modTitle = U3WorkshopMod.getModTitle(currentID);
 
-                        foreach (U3WorkshopMod Mod in server.getWorkshopContentMods().Where((m) => { return m.ID == currentID; }))
+                        foreach (U3WorkshopMod_Managed Mod in server.getWorkshopContentMods().Where((m) => { return m.ID == currentID; }))
                         {
                             args = new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.RemoveOld, Mod.ID, Mod.Name);
                             U3WorkshopModInstallStateChanged?.Invoke(this, args);
@@ -164,7 +164,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
 
         public void updateServer()
         {
-            foreach (U3WorkshopMod mod in server.getWorkshopContentMods())
+            foreach (U3WorkshopMod_Managed mod in server.getWorkshopContentMods())
             {
                 InstallationQueue.Enqueue(mod.ID);
             }

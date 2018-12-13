@@ -1,132 +1,159 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using System.IO;
 using Newtonsoft.Json;
-using HtmlAgilityPack;
-
 
 namespace UniversalOrganiserControls.Unturned3.Workshop
 {
     public class U3WorkshopMod
     {
+        private static string API_MODINFO = "http://dl.unturned-server-organiser.com/workshop/workshopFileInfo.php?id={0}";
+        private static string API_MODID = "http://dl.unturned-server-organiser.com/workshop/getModIDFromSite.php?modURL={0}";
 
-        private static string getUpdateUrl(string SteamSiteUrl)
+        public DirectoryInfo Path
         {
-            return string.Format("http://dl.unturned-server-organiser.com/mod.php?modURL={0}", SteamSiteUrl);
-        }
-        
-        private DirectoryInfo path;
-
-        public U3WorkshopMod(DirectoryInfo path)
-        {
-            this.path = path;
-        }
-
-
-
-        public String ID
-        {
-            get
-            {
-                return path.Name;
-            }
+            get;
+            private set;
         }
 
         public U3WorkshopModType Type
         {
             get
             {
-                try
+                if (Path.Exists)
                 {
-                    return new FileInfo(path.GetDirectories()[0].FullName + "\\level.dat").Exists ? U3WorkshopModType.Map : U3WorkshopModType.Content;
+                    if (File.Exists(Path.FullName + "\\Map.meta"))
+                    {
+                        return U3WorkshopModType.Map;
+                    }
+                    else
+                    {
+                        return U3WorkshopModType.Content;
+                    }
                 }
-                catch (Exception)
-                {
-                    return U3WorkshopModType.Unresolveable;
-                }
+
+                return U3WorkshopModType.Unresolveable;
             }
         }
-
-        public string[] Contents
+        
+        public IEnumerable<string> Tags
         {
-            get
-            {
-                List<string> contents = new List<string>();
+            get => getModTags(ID);
+        }
 
-                foreach (DirectoryInfo content in path.GetDirectories()) contents.Add(content.Name);
+        public string ID
+        {
+            get => Path.Name;
+        }
 
+        public string Title
+        {
+            get => getModTitle(ID);
+        }
+        
 
-                return contents.ToArray<string>();
-            }
+        public string ImageURL
+        {
+            get => getModImage(ID);
+        }
+
+        public U3WorkshopMod(string path)
+        {
+            this.Path = new DirectoryInfo(path);
         }
 
 
         public void Delete()
         {
-            try
-            {
-                path.Delete(true);
-            }
-            catch (Exception) { }
+            Path.Delete(true);
         }
 
-        
-        public string Name
+
+        public static string getModTitle(string id)
         {
-            get
+            try
             {
-                if (Type == U3WorkshopModType.Map)
+                string url = string.Format(API_MODINFO, id);
+                string result = new WebClient().DownloadString(url);
+                if (result != "STEAM_ERROR")
                 {
-                    if (path.GetDirectories().Length == 0)
-                    {
-                        return "Unknown";
-                    }
-                    else
-                    {
-                        return path.GetDirectories()[0].Name;
-                    }
+                    JObject o = JObject.Parse(result);
+                    JArray arr = JArray.Parse(o["response"]["publishedfiledetails"].ToString());
+                    JToken token = arr.Children().First();
+                    return token["title"].ToString();
+                } else
+                {
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                return string.Format("Unresolveable", id);
+            }
+        }
+
+        public static string getModImage(string id)
+        {
+            try
+            {
+                string url = string.Format(API_MODINFO, id);
+                string result = new WebClient().DownloadString(url);
+                if (result != "STEAM_ERROR")
+                {
+                    JObject o = JObject.Parse(result);
+                    JArray arr = JArray.Parse(o["response"]["publishedfiledetails"].ToString());
+                    JToken token = arr.Children().First();
+                    return token["preview_url"].ToString();
                 }
                 else
                 {
-
-                    FileInfo modinfo = new FileInfo(path.FullName + "\\mod.usoinfo");
-                    if (modinfo.Exists)
-                    {
-                        return File.ReadAllLines(modinfo.FullName)[0];
-                    }
-                    else
-                    {
-                        List<string> content = new List<string>();
-                        content.Add(getModTitle(ID));
-                        content.Add(ID);
-                        try
-                        {
-                            File.WriteAllLines(modinfo.FullName, content.ToArray<string>());
-
-                        }
-                        catch (Exception)
-                        {
-                            return content[0];
-                        }
-                        return Name;
-
-                    }
+                    return result;
                 }
-
+            }
+            catch (Exception)
+            {
+                return string.Format("Unresolveable", id);
             }
         }
 
-
-        public static string[] getIDsFromURL(string url)
+        public static IEnumerable<string> getModTags(string id)
         {
             try
             {
-                string response = new WebClient().DownloadString(getUpdateUrl(url));
+                string url = string.Format(API_MODINFO, id);
+
+                string result = new WebClient().DownloadString(url);
+                if (result != "STEAM_ERROR")
+                {
+                    JObject o = JObject.Parse(result);
+                    JArray arr = JArray.Parse(o["response"]["publishedfiledetails"].ToString());
+                    JToken token = arr.Children().First();
+                   
+                    foreach(JObject child in token["tags"].Children())
+                    {
+                        yield return child["tag"].ToString();
+                    }
+                }
+            } finally { }
+        }
+
+        public static string[] getIDFromWorkshopSite(string url)
+        {
+            try
+            {
+                string updateURL = string.Format(API_MODID, url);
+                string response = new WebClient().DownloadString(updateURL);
+
+
                 if (response == "invalid request")
                 {
-                    return new string[] { "invalid request" };
+                    return new string[] { };
                 }
                 else
                 {
@@ -139,47 +166,11 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
                         return new string[] { JsonConvert.DeserializeObject<string>(response) };
                     }
                 }
-
             }
             catch (Exception)
             {
-                return new string[0];
+                return new string[] { };
             }
-           
         }
-
-        
-        public static string getModTitle(string id)
-        {
-            try
-            {
-                WebClient client = new WebClient();
-                Uri modUri = new Uri("http://steamcommunity.com/sharedfiles/filedetails/?id=" + id);
-
-                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-                string doctext = client.DownloadString(modUri);
-
-                HtmlDocument doc = new HtmlDocument();
-                doc.LoadHtml(doctext);
-
-
-                IEnumerable<HtmlNode> elements = doc.DocumentNode.Descendants("div").Where(d =>
-                    d.Attributes.Contains("class") && d.Attributes["class"].Value.Equals("workshopItemTitle")
-                );
-
-                foreach (HtmlNode node in elements)
-                {
-                    return WebUtility.UrlDecode(node.InnerText);
-                }
-                return id;
-            }
-            catch (Exception)
-            {
-                return string.Format("NoNameAvailable[{0}]", id);
-            }
-
-        }
-
-
     }
 }
