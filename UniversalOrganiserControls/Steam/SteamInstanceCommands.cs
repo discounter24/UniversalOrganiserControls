@@ -93,8 +93,8 @@ namespace UniversalOrganiserControls.Steam
                 {
                     canceled = true;
                     waitForResult = new ManualResetEvent(false);
-
-                    sendCommand(username == null ? "login anonymous" : string.Format("login {0}{1}{2}", username, string.IsNullOrEmpty(" " + password) ? "" : " " + password, string.IsNullOrEmpty(" " + steamguard) ? "" : " " + steamguard));
+                    string cmd = username == null ? "login anonymous" : string.Format("login {0}{1}{2}", username, string.IsNullOrEmpty(" " + password) ? "" : " " + password, string.IsNullOrEmpty(" " + steamguard) ? "" : " " + steamguard);
+                    sendCommand(cmd);
                     waitForResult.WaitOne(timeout);
                     i++;
                 }

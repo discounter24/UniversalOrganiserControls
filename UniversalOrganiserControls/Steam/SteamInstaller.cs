@@ -50,7 +50,7 @@ namespace UniversalOrganiserControls.Steam
         {
             get
             {
-                return new Uri("https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip");
+                return new Uri("http://media.steampowered.com/installer/steamcmd.zip");
             }
         }
 

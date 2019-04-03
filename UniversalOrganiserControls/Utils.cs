@@ -162,20 +162,46 @@ namespace UniversalOrganiserControls
         {
             if (!dest.Exists) dest.Create();
 
-            foreach (var Entry in ZipFile.OpenRead(file.FullName).Entries)
+
+            Parallel.ForEach(ZipFile.OpenRead(file.FullName).Entries, entry =>
             {
                 try
                 {
-                    string dir = Path.GetFullPath(Path.Combine(dest.FullName, Entry.FullName));
+                    string dir = Path.GetFullPath(Path.Combine(dest.FullName, entry.FullName));
 
                     if (!Directory.Exists(Path.GetDirectoryName(dir)))
                     {
                         Directory.CreateDirectory(dir);
                     }
 
-                    if (Entry.Name != "")
+                    if (entry.Name != "")
                     {
-                        Entry.ExtractToFile((dir), true);
+                        entry.ExtractToFile((dir), true);
+                    }
+                }
+                catch (Exception) { }
+            });
+        }
+
+        public static void extractZipSerial(FileInfo file, DirectoryInfo dest)
+        {
+            if (!dest.Exists) dest.Create();
+
+
+            foreach(ZipArchiveEntry entry in ZipFile.OpenRead(file.FullName).Entries)
+            {
+                try
+                {
+                    string dir = Path.GetFullPath(Path.Combine(dest.FullName, entry.FullName));
+
+                    if (!Directory.Exists(Path.GetDirectoryName(dir)))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
+
+                    if (entry.Name != "")
+                    {
+                        entry.ExtractToFile((dir), true);
                     }
                 }
                 catch (Exception) { }

@@ -35,7 +35,7 @@ namespace UniversalOrganiserControls.Steam
             return Task<LoginResult>.Run(() =>
             {
                 if (instance.LoginState) return LoginResult.AlreadyLoggedIn;
-
+                instance.SteamOutput += Instance_SteamOutput;
                 bool cancel = false;
                 LoginResult result = instance.login(username,password,code);
                 if (result == LoginResult.WaitingForSteamGuard | result == LoginResult.SteamGuardCodeWrong)
@@ -88,6 +88,10 @@ namespace UniversalOrganiserControls.Steam
             });
         }
 
+        private void Instance_SteamOutput(object sender, string text)
+        {
+            Console.WriteLine(text);
+        }
 
         public void installGame(int id, string folder, bool validate = false)
         {
@@ -111,7 +115,7 @@ namespace UniversalOrganiserControls.Steam
                 throw new LoginRequiredException();
             }
         }
-        
+      
     }
 
     public class LoginRequiredException : Exception

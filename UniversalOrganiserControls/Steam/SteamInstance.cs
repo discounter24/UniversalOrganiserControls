@@ -120,13 +120,14 @@ namespace UniversalOrganiserControls.Steam
         {
             if (string.IsNullOrEmpty(e)) return;
             string line = e;
+            Console.WriteLine(e);
 
             SteamOutput?.Invoke(this, line);
 
             if (line.Equals("Loading Steam API...OK."))
             {
                 waitStartAsync.Set();
-                SteamExited?.Invoke(this, SteamExitReason.NonEnglishCharachers);
+                //SteamExited?.Invoke(this, SteamExitReason.NonEnglishCharachers);
             }
             else if (line.Contains("cannot run from a folder path that includes non-English characters"))
             {
