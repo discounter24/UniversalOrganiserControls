@@ -20,9 +20,10 @@ namespace ConsoleTest
 
         static void Main(string[] args)
         {
-            U3OnlineInstaller installer = new U3OnlineInstaller(new DirectoryInfo("C:\\ubuntu"));
+            U3OnlineInstaller installer = new U3OnlineInstaller(new DirectoryInfo(@"C:\Users\pasca\Unturned Servers\game"),500);
             installer.InstallationProgressChanged += Installer_InstallationProgressChanged;
             installer.Validate = true;
+
             installer.update();
 
 
@@ -49,7 +50,7 @@ namespace ConsoleTest
                     Console.WriteLine("Finished successfully!");
                     break;
                 case U3InstallationState.FailedSome:
-                    Console.WriteLine(string.Format("Finished with {0} failed executions.", e.processed, e.total));
+                    Console.WriteLine(string.Format("Finished with {0} failed executions.", e.total - e.processed));
                     break;
                 case U3InstallationState.FailedInternet:
                     Console.WriteLine("Failed: internet connection");
@@ -59,6 +60,9 @@ namespace ConsoleTest
                     break;
                 case U3InstallationState.FailedInvalidResponse:
                     Console.WriteLine("Failed: invalid response");
+                    break;
+                case U3InstallationState.PausedServerBusy:
+                    Console.WriteLine("Paused: The server is busy. We will continue when its available.");
                     break;
                 default:
                     break;

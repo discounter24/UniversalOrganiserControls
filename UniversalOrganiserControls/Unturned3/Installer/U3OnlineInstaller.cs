@@ -21,6 +21,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
         private DirectoryInfo installDir;
         private List<IndexItem> items;
 
+        public int UpdateInterval { get; set; }
         public int DegreeOfParallelism { get; private set; }
         public bool Resinstall { get; set; }
         public bool Validate { get; set; }
@@ -57,12 +58,32 @@ namespace UniversalOrganiserControls.Unturned3.Installer
             this.Resinstall = false;
             this.Validate = false;
             this.DegreeOfParallelism = degreeOfParallelism;
+            this.UpdateInterval = 100;
         }
 
         public Task<U3InstallationState> update()
         {
             return Task.Run(() =>
             {
+                bool busy = false;
+                try
+                {
+                    busy = Convert.ToBoolean(new WebClient().DownloadString(baseUrl + "/busy.php"));
+                }
+                catch (Exception) { }
+
+                while (busy)
+                {
+                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.PausedServerBusy, 0, 0));
+                    Task.Delay(5000).Wait();
+
+                    try
+                    {
+                        busy = Convert.ToBoolean(new WebClient().DownloadString(baseUrl + "/busy.php"));
+                    }
+                    catch (Exception) { }
+                }
+
                 string json = null;
                 try
                 {
@@ -116,13 +137,15 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                         while (taskBarrier.CurrentCount != DegreeOfParallelism)
                         {
                             InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.Downloading, executed, total));
-                            await Task.Delay(500);
+                            await Task.Delay(UpdateInterval);
                         }
                     });
 
                     foreach (var item in items)
                     {
                         string filename = installDir.FullName + "\\" + item.name.Substring(5);
+
+
                         if (item.isFolder)
                         {
                             try
@@ -143,8 +166,12 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                             taskBarrier.Wait();
                             Task.Run(() =>
                             {
+                                string dl = this.baseUrl + item.name;
                                 try
                                 {
+                                    FileInfo info = new FileInfo(filename);
+                                    if (!info.Directory.Exists) info.Directory.Create();
+
                                     if (Validate && File.Exists(filename))
                                     {
                                         string originMD5 = item.hash;
@@ -152,7 +179,6 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                                         if (!fileMD5.Equals(originMD5))
                                         {
                                             WebClient client = new WebClient();
-                                            string dl = this.baseUrl + item.name;
                                             client.DownloadFile(dl, filename);
                                         }
                                         executed++;
@@ -160,14 +186,13 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                                     else
                                     {
                                         WebClient client = new WebClient();
-                                        string dl = this.baseUrl + item.name;
                                         client.DownloadFile(dl, filename);
                                         executed++;
                                     }
 
                               
                                 }
-                                catch (Exception)
+                                catch (Exception ex)
                                 {
                                     error = true;
                                 }
