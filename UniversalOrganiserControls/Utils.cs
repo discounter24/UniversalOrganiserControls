@@ -208,6 +208,66 @@ namespace UniversalOrganiserControls
             }
         }
 
+
+
+        /// <summary>
+        /// Searches the given directory for all its containing files.
+        /// </summary>
+        /// <param name="dir">The directory searched.</param>
+        /// <returns>A list of all files in the searched directory.</returns>
+        public static List<FileInfo> getFilesSync(DirectoryInfo dir)
+        {
+            List<FileInfo> files = new List<FileInfo>();
+            try
+            {
+                files.AddRange(dir.EnumerateFiles());
+            }
+            catch (Exception)
+            {
+                //Rather skip some files than just crashing.
+            }
+            
+            foreach (DirectoryInfo subdir in dir.GetDirectories())
+            {
+                try
+                {
+                    files.AddRange(getFilesSync(subdir));
+                }
+                catch (Exception)
+                {
+                    //Rather skip some files than just crashing.
+                }
+
+            }
+
+            return files;
+        }
+
+
+        /// <summary>
+        /// Calculates the md5 hashes for a given list of files.
+        /// </summary>
+        /// <param name="files">The files for which we caluclate the hashes</param>
+        /// <param name="hashes">A dictionary with the results.</param>
+        /// <returns>The parallel task running until all hashes have been calculated.</returns>
+        public static Task calculateFileHashes(List<FileInfo> files, Dictionary<string, string> hashes)
+        {
+            return Task.Run(() =>
+            {
+                List<Task> tasks = new List<Task>();
+                foreach (var file in files)
+                {
+                    tasks.Add(Task.Run(() =>
+                    {
+                        hashes.Add(file.FullName, GetMD5HashOfFile(file.FullName));
+                    }));
+                }
+
+                Task.WaitAll(tasks.ToArray());
+            });
+        }
+
+
     }
 
 

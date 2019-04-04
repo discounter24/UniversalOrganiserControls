@@ -16,45 +16,53 @@ namespace ConsoleTest
 {
     class Program
     {
-
+         
 
         static void Main(string[] args)
         {
             U3OnlineInstaller installer = new U3OnlineInstaller(new DirectoryInfo("C:\\ubuntu"));
+            installer.InstallationProgressChanged += Installer_InstallationProgressChanged;
+            installer.Validate = true;
             installer.update();
 
-            /*
-            Process p = new Process();
-            p.StartInfo.WorkingDirectory = @"C:\Users\pasca\Unturned Servers\";
-            p.StartInfo.FileName = "cmd.exe";
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardInput = true;
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.OutputDataReceived += P_OutputDataReceived;
-
-            p.Start();
-
-            p.BeginOutputReadLine();
-            p.BeginErrorReadLine();
-
-            Task.Run(() =>
-            {
-                p.StandardInput.WriteLine("steamcmd.exe");
-                Task.Delay(2000).Wait();
-
-                p.StandardInput.WriteLine("login anonymous");
-                p.StandardInput.WriteLine(Environment.NewLine);
-                Task.Delay(2000).Wait();
-                
-            });
-
-            
-            */
 
 
 
             while (true) Console.ReadKey();
+        }
+
+        private static void Installer_InstallationProgressChanged(object sender, U3OnlineInstallationProgressArgs e)
+        {
+            Console.Clear();
+            switch (e.state)
+            {
+                case U3InstallationState.SearchingUpdates:
+                    Console.WriteLine("Searching for updates..");
+                    break;
+                case U3InstallationState.CalculatingFileDifferences:
+                    Console.WriteLine("Calculating changes..");
+                    break;
+                case U3InstallationState.Downloading:
+                    Console.WriteLine(string.Format("Updating files {0}/{1}..",e.processed,e.total));
+                    break;
+                case U3InstallationState.Ok:
+                    Console.WriteLine("Finished successfully!");
+                    break;
+                case U3InstallationState.FailedSome:
+                    Console.WriteLine(string.Format("Finished with {0} failed executions.", e.processed, e.total));
+                    break;
+                case U3InstallationState.FailedInternet:
+                    Console.WriteLine("Failed: internet connection");
+                    break;
+                case U3InstallationState.FailedUnknown:
+                    Console.WriteLine("Failed: unknown");
+                    break;
+                case U3InstallationState.FailedInvalidResponse:
+                    Console.WriteLine("Failed: invalid response");
+                    break;
+                default:
+                    break;
+            }
         }
 
         private static void P_OutputDataReceived(object sender, DataReceivedEventArgs e)

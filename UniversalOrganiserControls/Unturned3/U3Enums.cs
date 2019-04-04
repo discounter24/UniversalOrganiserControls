@@ -8,5 +8,5 @@ namespace UniversalOrganiserControls.Unturned3
 {
     public enum U3ServerState { Starting, Restarting, Stopping, Running, Stopped}
     public enum U3ServerStartResult { OK, AlreadyRunning, BattlEyeFail, ProcessCreationFailure}
-    public enum U3InstallationResult { OK , FailedUnknown }
+    public enum U3InstallationState { SearchingUpdates, CalculatingFileDifferences, Downloading, Ok, FailedSome, FailedInternet, FailedUnknown, FailedInvalidResponse }
 }

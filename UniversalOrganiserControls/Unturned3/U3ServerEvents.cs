@@ -24,6 +24,20 @@ namespace UniversalOrganiserControls.Unturned3
         }
     }
 
+    public class U3OnlineInstallationProgressArgs
+    {
+        public U3InstallationState state;
+        public int processed;
+        public int total;
+
+        public U3OnlineInstallationProgressArgs(U3InstallationState state, int processed = 0, int total = 0)
+        {
+            this.state = state;
+            this.processed = processed;
+            this.total = total;
+        }
+    }
+
 
 
 
