@@ -30,12 +30,26 @@ namespace UniversalOrganiserControls.Unturned3
         public int processed;
         public int total;
 
-        public U3OnlineInstallationProgressArgs(U3InstallationState state, int processed = 0, int total = 0)
+        public double percentage
+        {
+            get
+            {
+                double d = Convert.ToDouble(processed) / Convert.ToDouble(total) * 100d;
+                return Math.Round(d, 2); 
+            }
+        }
+
+        public U3OnlineInstallationProgressArgs(U3InstallationState state, int processed = 0, int total = 0, int errors = 0)
         {
             this.state = state;
             this.processed = processed;
             this.total = total;
         }
+    }
+
+    public class U3OnlineInstallerAskForUserToAcceptUpdate
+    {
+        public bool cancel = false;
     }
 
 

@@ -124,7 +124,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
                                     FileInfo info = new FileInfo(tmpFile);
                                     if (info.Length > 0)
                                     {
-                                        UtilsGeneral.extractZip(info, gamedir);
+                                        UtilsGeneral.extractZipSerial(info, gamedir);
                                         LocalVersion = v;
                                     }
                                     else

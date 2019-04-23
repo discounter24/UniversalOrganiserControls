@@ -167,16 +167,22 @@ namespace UniversalOrganiserControls
             {
                 try
                 {
-                    string dir = Path.GetFullPath(Path.Combine(dest.FullName, entry.FullName));
+                    string f = Path.GetFullPath(Path.Combine(dest.FullName, entry.FullName));
+                    FileInfo fileInfo = new FileInfo(f);
 
-                    if (!Directory.Exists(Path.GetDirectoryName(dir)))
+                    if (!fileInfo.Directory.Exists)
                     {
-                        Directory.CreateDirectory(dir);
+                        fileInfo.Directory.Create();
                     }
+
+                    /*if (!Directory.Exists(Path.GetDirectoryName(file)))
+                    {
+                        Directory.CreateDirectory(file);
+                    }*/
 
                     if (entry.Name != "")
                     {
-                        entry.ExtractToFile((dir), true);
+                        entry.ExtractToFile(f, true);
                     }
                 }
                 catch (Exception) { }

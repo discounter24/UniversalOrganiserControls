@@ -1,13 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace UniversalOrganiserControls.Unturned3.Installer
 {
@@ -15,6 +12,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
     {
 
         public event EventHandler<U3OnlineInstallationProgressArgs> InstallationProgressChanged;
+        public event EventHandler<U3OnlineInstallerAskForUserToAcceptUpdate> AskForAcceptUpdate;
 
         private string baseUrl;
         private string indexUrl;
@@ -23,8 +21,16 @@ namespace UniversalOrganiserControls.Unturned3.Installer
 
         public int UpdateInterval { get; set; }
         public int DegreeOfParallelism { get; private set; }
-        public bool Resinstall { get; set; }
+        public bool FreshInstall { get; set; }
+        public bool KeepServersOnFreshInstall { get; set; }
         public bool Validate { get; set; }
+
+        public bool Aborted
+        {
+            get;
+            private set;
+        }
+
 
         public Int64 lastUpdate
         {
@@ -55,16 +61,20 @@ namespace UniversalOrganiserControls.Unturned3.Installer
             this.indexUrl = "http://dl.unturned-server-organiser.com/unturned/getIndex.php?lastUpdate={0}";
             this.installDir = installDir;
             this.items = new List<IndexItem>();
-            this.Resinstall = false;
+            this.FreshInstall = false;
+            this.KeepServersOnFreshInstall = true;
             this.Validate = false;
             this.DegreeOfParallelism = degreeOfParallelism;
             this.UpdateInterval = 100;
+           
         }
 
         public Task<U3InstallationState> update()
         {
+           
             return Task.Run(() =>
             {
+                this.Aborted = false;
                 bool busy = false;
                 try
                 {
@@ -72,11 +82,11 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                 }
                 catch (Exception) { }
 
-                while (busy)
+                while (busy  && !Aborted)
                 {
-                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.PausedServerBusy, 0, 0));
+                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.PausedServerBusy));
                     Task.Delay(5000).Wait();
-
+                    
                     try
                     {
                         busy = Convert.ToBoolean(new WebClient().DownloadString(baseUrl + "/busy.php"));
@@ -84,22 +94,28 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                     catch (Exception) { }
                 }
 
+                if (Aborted)
+                {
+                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.AbortedByCall));
+                    return U3InstallationState.AbortedByCall;
+                }
+
                 string json = null;
                 try
                 {
-                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.SearchingUpdates, 0, 0));
-                    long time = (Resinstall || Validate) ? 0 : lastUpdate;
+                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.SearchingUpdates));
+                    long time = (FreshInstall || Validate) ? 0 : lastUpdate;
                     json = new WebClient().DownloadString(string.Format(indexUrl, time));
                 }
                 catch (Exception)
                 {
-                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.FailedInternet, 0, 0));
+                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.FailedInternet));
                     return U3InstallationState.FailedInternet;
                 }
 
                 if (string.IsNullOrEmpty(json) || json.Equals("[]"))
                 {
-                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.Ok, 0, 0));
+                    InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.Ok));
                     return U3InstallationState.Ok;
                 }
                 else
@@ -123,26 +139,49 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                         InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.FailedInvalidResponse, 0, 0));
                         return U3InstallationState.FailedInvalidResponse;
                     }
-
-
+                    
 
 
                     SemaphoreSlim taskBarrier = new SemaphoreSlim(DegreeOfParallelism);
                     int executed = 0;
+                    int errors = 0;
                     int total = items.Count;
-                    bool error = false;
+
+                    if (total > 0)
+                    {
+                        U3OnlineInstallerAskForUserToAcceptUpdate args = new U3OnlineInstallerAskForUserToAcceptUpdate();
+                        AskForAcceptUpdate?.Invoke(this, args);
+
+                        if (args.cancel)
+                        {
+                            InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.Ok, executed, total));
+                            return U3InstallationState.Ok;
+                        }
+                    }
 
                     Task waitHandle = Task.Run(async () =>
                     {
-                        while (taskBarrier.CurrentCount != DegreeOfParallelism)
+                        while (taskBarrier.CurrentCount != DegreeOfParallelism || executed != total)
                         {
                             InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.Downloading, executed, total));
                             await Task.Delay(UpdateInterval);
                         }
                     });
 
+                    if (FreshInstall)
+                    {
+                        InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.DeletingOldFiles));
+                        deleteOldFiles();
+                    }
+
+
                     foreach (var item in items)
                     {
+                        if (Aborted)
+                        {
+                            break;
+                        }
+
                         string filename = installDir.FullName + "\\" + item.name.Substring(5);
 
 
@@ -153,12 +192,11 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                                 if (!Directory.Exists(filename))
                                 {
                                     Directory.CreateDirectory(filename);
-                                    executed++;
                                 }
                             }
                             catch (Exception)
                             {
-                                error = true;
+                                errors++;
                             }
                         }
                         else
@@ -181,33 +219,39 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                                             WebClient client = new WebClient();
                                             client.DownloadFile(dl, filename);
                                         }
-                                        executed++;
                                     }
                                     else
                                     {
                                         WebClient client = new WebClient();
                                         client.DownloadFile(dl, filename);
-                                        executed++;
                                     }
 
                               
                                 }
                                 catch (Exception ex)
                                 {
-                                    error = true;
+                                    errors++;
                                 }
                                 taskBarrier.Release();
                             });
                         }
+                        executed++;
+
                     }
 
 
                     waitHandle.Wait();
 
-                    lastUpdate = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-                    if (error)
+                    if (Aborted)
                     {
-                        InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.FailedSome, executed, total));
+                        InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.AbortedByCall, executed, total, errors));
+                        return U3InstallationState.AbortedByCall;
+                    }
+
+                    lastUpdate = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                    if (errors>0)
+                    {
+                        InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.FailedSome, executed, total,errors));
                         return U3InstallationState.FailedSome;
                     }
                     else
@@ -221,6 +265,48 @@ namespace UniversalOrganiserControls.Unturned3.Installer
             });
         }
 
+        public void deleteOldFiles()
+        {
+            try
+            {
+                foreach(FileInfo file in installDir.GetFiles())
+                {
+                    try
+                    {
+                        file.Delete();
+                    }
+                    catch (Exception)  {  }
+                }
+
+                Parallel.ForEach(installDir.GetDirectories(), (dir) =>
+                 {
+                     if (dir.Name.Equals("Servers") && KeepServersOnFreshInstall)
+                     {
+                        //Skip
+                     }
+                     else
+                     {
+                         try
+                         {
+                             dir.Delete(true);
+                             InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.DeletingOldFiles));
+                         }
+                         catch (Exception) { }
+                     }
+
+                 });
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public void abort()
+        {
+            Aborted = true;
+        }
 
 
 
