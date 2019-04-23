@@ -127,7 +127,7 @@
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Unturned4\%28placeholder%29\" />
+    <Folder Include="Unturned4 %28top secret%29\%28placeholder%29\" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="NATUPNPLib">
@@ -144,7 +144,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\UnturnedServerOrganiser\UnturnedConsoleBridge.Networking\OrganiserNetworking.csproj">
+    <ProjectReference Include="..\..\UnturnedServerOrganiser\OrganiserNetworking\OrganiserNetworking.csproj">
       <Project>{ead268aa-59bd-4cf7-8f4f-5033968162e3}</Project>
       <Name>OrganiserNetworking</Name>
     </ProjectReference>
