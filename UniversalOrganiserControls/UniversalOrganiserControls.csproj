@@ -127,7 +127,7 @@
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Unturned4\%28placeholder%29\" />
+    <Folder Include="Unturned4 %28top secret%29\%28placeholder%29\" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="NATUPNPLib">
