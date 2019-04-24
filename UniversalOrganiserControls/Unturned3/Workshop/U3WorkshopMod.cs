@@ -134,13 +134,14 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
                     JObject o = JObject.Parse(result);
                     JArray arr = JArray.Parse(o["response"]["publishedfiledetails"].ToString());
                     JToken token = arr.Children().First();
-                   
-                    foreach(JObject child in token["tags"].Children())
+
+                    foreach (JObject child in token["tags"].Children())
                     {
                         yield return child["tag"].ToString();
                     }
                 }
-            } finally { }
+            }
+            finally { }
         }
 
         public static string[] getIDFromWorkshopSite(string url)

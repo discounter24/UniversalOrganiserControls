@@ -139,6 +139,8 @@ namespace UniversalOrganiserControls.UPnP
                                 switch (port.Type)
                                 {
                                     case PortType.TCP:
+                                        
+                                        await device.CreatePortMapAsync(new Mapping(Protocol.Tcp, System.Net.IPAddress.Parse(Utils.GetLocalIP()), 100, 100, 0, port.Description));
                                         await device.CreatePortMapAsync(new Mapping(Protocol.Tcp, port.InternalPort, port.ExternalPort, port.Description));
                                         return PortResult.Opened;
                                     case PortType.UDP:
@@ -155,7 +157,7 @@ namespace UniversalOrganiserControls.UPnP
                                 return PortResult.FailedUnknown;
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         return PortResult.FailedUnknown;
                     }
