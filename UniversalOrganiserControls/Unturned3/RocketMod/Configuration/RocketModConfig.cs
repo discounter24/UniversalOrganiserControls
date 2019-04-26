@@ -216,6 +216,59 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
             }
         }
 
+        public bool WebPermissions
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/WebPermissions");
+                return Convert.ToBoolean(node.Attributes["Enabled"]?.InnerText);
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/WebPermissions").Attributes["Enabled"].InnerText = value.ToString().ToLower();
+            }
+        }
+
+
+        public string WebPermissionsUrl
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/WebPermissions");
+                return node.Attributes["Url"]?.InnerText;
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/WebPermissions").Attributes["Url"].InnerText = value.ToString();
+            }
+        }
+
+        public string WebPermissionsInterval
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/WebPermissions");
+                return node.Attributes["Interval"]?.InnerText;
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/WebPermissions").Attributes["Interval"].InnerText = value.ToString().ToLower();
+            }
+        }
+
+        public string LanguageCode
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/LanguageCode");
+                return node.InnerText;
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/LanguageCode").InnerText = value.ToString();
+            }
+        }
+
         public bool AutoShutdown
         {
             get
@@ -242,6 +295,83 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
             }
         }
 
+        public bool CharacterNameValidation
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/CharacterNameValidation");
+                return Convert.ToBoolean(node.InnerText);
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/CharacterNameValidation").InnerText = value.ToString().ToLower();
+            }
+        }
+
+        public string CharacterNameValidationRule
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/CharacterNameValidationRule");
+                return node.InnerText;
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/CharacterNameValidationRule").InnerText = value.ToString();
+            }
+        }
+
+        public string MaxSpawnAmount
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/MaxSpawnAmount");
+                return node.InnerText;
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/MaxSpawnAmount").InnerText = value.ToString();
+            }
+        }
+
+        public bool EnableVehicleBlacklist
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableVehicleBlacklist");
+                return Convert.ToBoolean(node.InnerText);
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableVehicleBlacklist").InnerText = value.ToString().ToLower();
+            }
+        }
+
+        public bool EnableItemBlacklist
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableItemBlacklist");
+                return Convert.ToBoolean(node.InnerText);
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableItemBlacklist").InnerText = value.ToString().ToLower();
+            }
+        }
+
+        public bool EnableItemSpawnLimit
+        {
+            get
+            {
+                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableItemSpawnLimit");
+                return Convert.ToBoolean(node.InnerText);
+            }
+            set
+            {
+                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableItemSpawnLimit").InnerText = value.ToString().ToLower();
+            }
+        }
 
 
     }
