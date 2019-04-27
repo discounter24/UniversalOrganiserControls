@@ -28,7 +28,6 @@ namespace UniversalOrganiserControls.Unturned3.UCB
 
         public UCBServer server { get; private set; }
 
-        //private List<UCBServerConnection> Identiefed = new List<UCBServerConnection>();
         public List<U3Server> AvailableServers { get; private set; }
 
   

@@ -72,6 +72,21 @@
     <Compile Include="Backup\BackupProgressArgs.cs" />
     <Compile Include="Backup\BackupProcess.cs" />
     <Compile Include="Backup\BackupSpace.cs" />
+    <Compile Include="Minecraft\MojangVersionAPI.cs" />
+    <Compile Include="Minecraft\AdvancedVersionAPI.cs" />
+    <Compile Include="Minecraft\ServerVersion.cs" />
+    <Compile Include="Minecraft\Server\IMinecraftServer.cs" />
+    <Compile Include="Minecraft\Server\MinecraftEULA.cs" />
+    <Compile Include="Minecraft\Server\MinecraftServer.cs" />
+    <Compile Include="Minecraft\Server\Plugins\PluginSpace.cs" />
+    <Compile Include="Minecraft\Server\Properties\BoolProperty.cs" />
+    <Compile Include="Minecraft\Server\Properties\IntProperty.cs" />
+    <Compile Include="Minecraft\Server\Properties\Property.cs" />
+    <Compile Include="Minecraft\Server\Properties\ServerProperties.cs" />
+    <Compile Include="Minecraft\Server\ServerCreationProcess.cs" />
+    <Compile Include="Minecraft\Server\ServerCreationStateArgs.cs" />
+    <Compile Include="Minecraft\Server\SpigotServer.cs" />
+    <Compile Include="Minecraft\Utils.cs" />
     <Compile Include="Steam\Enums.cs" />
     <Compile Include="Steam\GameInstaller.cs" />
     <Compile Include="Steam\Utils.cs" />
@@ -126,9 +141,7 @@
     <Compile Include="UPnP\WindowsUPnP.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Unturned4 %28top secret%29\%28placeholder%29\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <COMReference Include="NATUPNPLib">
       <Guid>{1C565858-F302-471E-B409-F180AA4ABEC6}</Guid>
