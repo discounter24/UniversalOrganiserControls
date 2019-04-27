@@ -13,8 +13,8 @@ namespace UniversalOrganiserControls.Steam
     public delegate void SteamInstalled(object sender, FileInfo SteamCMDExe);
     public delegate void SteamInstallationError(object sender, Exception ex);
 
-    
 
+    [Obsolete("Valve changed something in the way SteamCMD so this won't work any longer.")]
     public class SteamInstaller
     {
         public SteamInstalled SteamInstalled;

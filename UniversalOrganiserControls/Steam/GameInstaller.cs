@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace UniversalOrganiserControls.Steam
 {
 
-    
 
+    [Obsolete("Valve changed something in the way SteamCMD so this won't work any longer.")]
     public class SteamGameInstaller
     {
 

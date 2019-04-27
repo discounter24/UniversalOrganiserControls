@@ -23,6 +23,7 @@ namespace UniversalOrganiserControls.Steam
     public delegate void ModDownloaded(object sender, string folder);
 
 
+    [Obsolete("Valve changed something in the way SteamCMD works so this broke.")]
     public partial class SteamInstance
     {
 
