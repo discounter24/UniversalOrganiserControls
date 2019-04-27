@@ -1,37 +1,9 @@
-## Welcome to GitHub Pages
+## Universal Organiser Control
 
-You can use the [editor on GitHub](https://github.com/discounter24/UniversalOrganiserControls/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+This repository is the core of most functions in [Unturned Server Organiser](https://unturned-server-organiser.com/) and [Minecraft Server Organiser](https://minecraft-server-organiser.com/). Feel free to browser the code, open issues or help improve te code by creating push requests.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/discounter24/UniversalOrganiserControls/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
 ### Support or Contact
+Discord: https://minecraft-server-organiser.com/
+Mail (for business): support@unturned-server-organiser.com
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
