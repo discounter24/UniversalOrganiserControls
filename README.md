@@ -4,6 +4,6 @@ This repository is the core of most functions in [Unturned Server Organiser](htt
 
 
 ### Support or Contact
-Discord: https://minecraft-server-organiser.com/
+Discord: https://discord.gg/8sMTPEH
 Mail (for business): support@unturned-server-organiser.com
 
