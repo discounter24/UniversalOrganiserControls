@@ -9,7 +9,7 @@ namespace UniversalOrganiserControls.Steam
 {
 
 
-    [Obsolete("Valve changed something in the way SteamCMD so this won't work any longer.")]
+    [Obsolete("Valve changed something in the way SteamCMD  works so this broke.")]
     public class SteamGameInstaller
     {
 
