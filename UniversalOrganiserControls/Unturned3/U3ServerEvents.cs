@@ -10,7 +10,7 @@ namespace UniversalOrganiserControls.Unturned3
     public delegate void RocketBridgeConnectionStateChanged(object instance, bool state);
 
 
-    public class U3ServerRenamedArgs
+    public class U3ServerRenamedArgs : EventArgs
     {
         public U3Server Server;
         public string NewName;
@@ -24,7 +24,7 @@ namespace UniversalOrganiserControls.Unturned3
         }
     }
 
-    public class U3OnlineInstallationProgressArgs
+    public class U3OnlineInstallationProgressArgs : EventArgs
     {
         public U3InstallationState state;
         public int processed;
@@ -47,11 +47,12 @@ namespace UniversalOrganiserControls.Unturned3
         }
     }
 
-    public class U3OnlineInstallerAskForUserToAcceptUpdate
+    public class U3OnlineInstallerAskForUserToAcceptUpdate : EventArgs
     {
         public bool cancel = false;
     }
 
+    public class U3ServerStateChangedEventArgs : EventArgs { U3ServerState state; }
 
 
 

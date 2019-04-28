@@ -15,24 +15,24 @@ namespace UniversalOrganiserControls
     {
 
         [DllImport("user32.dll")]
-        public static extern IntPtr GetForegroundWindow();
+        internal static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll")]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
         [DllImport("user32.dll", SetLastError = true)]
-        public static extern IntPtr FindWindow(IntPtr ZeroOnly, string lpWindowName);
+        internal static extern IntPtr FindWindow(IntPtr ZeroOnly, string lpWindowName);
 
         [DllImport("user32.dll")]
-        public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ShowWindow(IntPtr hWnd, WinApiWindowState flags);
+        internal static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ShowWindow(IntPtr hWnd, WinApiWindowCommands nCmdShow);
+        internal static extern bool ShowWindow(IntPtr hWnd, WinApiWindowState flags);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ShowWindow(IntPtr hWnd, WinApiWindowCommands nCmdShow);
 
 
         public enum WinApiWindowCommands

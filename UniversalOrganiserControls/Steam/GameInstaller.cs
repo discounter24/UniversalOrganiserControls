@@ -118,6 +118,7 @@ namespace UniversalOrganiserControls.Steam
       
     }
 
+    [Serializable]
     public class LoginRequiredException : Exception
     {
         public LoginRequiredException() : base("Please login before starting to install or update a game."){ }
