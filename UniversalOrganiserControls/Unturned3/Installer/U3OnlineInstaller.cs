@@ -269,7 +269,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
 
                               
                                 }
-                                catch (Exception ex)
+                                catch (Exception)
                                 {
                                     errors++;
                                 }

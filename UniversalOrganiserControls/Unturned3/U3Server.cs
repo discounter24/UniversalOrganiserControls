@@ -313,7 +313,7 @@ namespace UniversalOrganiserControls.Unturned3
                     {
                         standardMaps.Create();
                     }
-                    catch (Exception ex) { }
+                    catch (Exception) { }
                 }
                 else
                 {

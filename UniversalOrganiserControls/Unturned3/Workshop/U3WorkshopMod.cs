@@ -92,7 +92,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
                     return result;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return string.Format("Unresolveable", id);
             }

@@ -157,7 +157,7 @@ namespace UniversalOrganiserControls.UPnP
                                 return PortResult.FailedUnknown;
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         return PortResult.FailedUnknown;
                     }
