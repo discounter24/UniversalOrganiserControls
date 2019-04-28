@@ -21,6 +21,11 @@ using System.Threading;
 
 namespace UniversalOrganiserControls.Unturned3
 {
+
+
+    /// <summary>
+    /// Represents an Unturned 3 server
+    /// </summary>
     public class U3Server
     {
            
@@ -255,7 +260,7 @@ namespace UniversalOrganiserControls.Unturned3
             {
                 return _playerlist;
             }
-            private set
+            set
             {
                 _playerlist = value;
                 PlayerListUpdated.Invoke(this, _playerlist);

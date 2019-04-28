@@ -9,6 +9,8 @@ namespace UniversalOrganiserControls.Unturned3.Utils
 {
     public static class Workshop
     {
+
+        [Obsolete("Was needed for a old version of Unturned")]
         /// <summary>
         /// If not already existant, this method creates needed workshop folders for a given Unturned game.
         /// </summary>

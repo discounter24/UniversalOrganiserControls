@@ -12,9 +12,9 @@ namespace UniversalOrganiserControls.Unturned3
 
     public class U3ServerRenamedArgs
     {
-        U3Server Server;
-        string NewName;
-        string OldName;
+        public U3Server Server;
+        public string NewName;
+        public string OldName;
 
         public U3ServerRenamedArgs(U3Server Server, string NewName, string OldName)
         {
