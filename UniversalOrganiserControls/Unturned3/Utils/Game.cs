@@ -11,7 +11,11 @@ namespace UniversalOrganiserControls.Unturned3.Utils
 {
     public static class Game
     {
+        /// <summary>
+        /// Holds the Steam app id for Unturned 3
+        /// </summary>
         public const int APP_ID = 304930;
+
 
         public static string getOfficialVersion()
         {
@@ -24,6 +28,7 @@ namespace UniversalOrganiserControls.Unturned3.Utils
                 return "(unable to retrieve version)";
             }
         }
+
 
         public static DirectoryInfo getLocalUnturnedInstallation()
         {

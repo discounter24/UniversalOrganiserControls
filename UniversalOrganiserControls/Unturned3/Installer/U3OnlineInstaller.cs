@@ -10,29 +10,60 @@ namespace UniversalOrganiserControls.Unturned3.Installer
 {
     public class U3OnlineInstaller
     {
-
+        /// <summary>
+        /// Triggers when the installation makes progress
+        /// </summary>
         public event EventHandler<U3OnlineInstallationProgressArgs> InstallationProgressChanged;
+
+        /// <summary>
+        /// Callback event for asking to continue the update. If not used the update will automatically continue
+        /// </summary>
         public event EventHandler<U3OnlineInstallerAskForUserToAcceptUpdate> AskForAcceptUpdate;
+
+
 
         private string baseUrl;
         private string indexUrl;
         private DirectoryInfo installDir;
         private List<IndexItem> items;
 
+
+
+
+        /// <summary>
+        /// Sets the update interval of the progress changed event
+        /// </summary>
         public int UpdateInterval { get; set; }
+
+        /// <summary>
+        /// The amount of tasks running in parallel for downloading the game files.
+        /// </summary>
         public int DegreeOfParallelism { get; private set; }
+
+        /// <summary>
+        /// Gets or sets if the installer will clear old files and redownload all of them.
+        /// </summary>
         public bool FreshInstall { get; set; }
+
+        /// <summary>
+        /// Gets or sets if the installer will keep server files when the installer does a fresh install
+        /// </summary>
         public bool KeepServersOnFreshInstall { get; set; }
+
+        /// <summary>
+        /// Gets or sets if the files should be validated with MD5 hashes on updates.
+        /// </summary>
         public bool Validate { get; set; }
 
-        public bool Aborted
-        {
-            get;
-            private set;
-        }
+        /// <summary>
+        /// True when the installer received an abort call
+        /// </summary>
+        public bool Aborted {  get; private set; }
 
-
-        public Int64 lastUpdate
+        /// <summary>
+        /// Unix timestamp of when the last update where done
+        /// </summary>
+        public Int64 LastUpdate
         {
             get
             {
@@ -55,6 +86,12 @@ namespace UniversalOrganiserControls.Unturned3.Installer
             }
         }
 
+
+        /// <summary>
+        /// Creates a new installer for Unturned 3
+        /// </summary>
+        /// <param name="installDir">The directory to which the game should be installed</param>
+        /// <param name="degreeOfParallelism"></param>
         public U3OnlineInstaller(DirectoryInfo installDir, int degreeOfParallelism = 500)
         {
             this.baseUrl = "http://dl.unturned-server-organiser.com/unturned/";
@@ -69,6 +106,10 @@ namespace UniversalOrganiserControls.Unturned3.Installer
            
         }
 
+        /// <summary>
+        /// Installs or updates Unturned 3 game files.
+        /// </summary>
+        /// <returns></returns>
         public Task<U3InstallationState> update()
         {
            
@@ -104,7 +145,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                 try
                 {
                     InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.SearchingUpdates));
-                    long time = (FreshInstall || Validate) ? 0 : lastUpdate;
+                    long time = (FreshInstall || Validate) ? 0 : LastUpdate;
                     json = new WebClient().DownloadString(string.Format(indexUrl, time));
                 }
                 catch (Exception)
@@ -248,7 +289,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                         return U3InstallationState.AbortedByCall;
                     }
 
-                    lastUpdate = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                    LastUpdate = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                     if (errors>0)
                     {
                         InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.FailedSome, executed, total,errors));
@@ -265,6 +306,9 @@ namespace UniversalOrganiserControls.Unturned3.Installer
             });
         }
 
+        /// <summary>
+        /// Deletes old game files.
+        /// </summary>
         public void deleteOldFiles()
         {
             try
@@ -303,10 +347,11 @@ namespace UniversalOrganiserControls.Unturned3.Installer
             }
         }
 
-        public void abort()
-        {
-            Aborted = true;
-        }
+
+        /// <summary>
+        /// Aborts the installation process.
+        /// </summary>
+        public void abort() { Aborted = true; }
 
 
 
