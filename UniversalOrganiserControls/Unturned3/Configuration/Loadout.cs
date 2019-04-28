@@ -60,12 +60,12 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
             return line;
         }
 
-        public void addItem(int item, int count = 1)
+        public void AddItem(int item, int count = 1)
         {
             Items.Add(item);
         }
 
-        public void removeItem(int item, int count = 1)
+        public void RemoveItem(int item, int count = 1)
         {
             for (int i = 0; i < count; i++)
             {

@@ -93,7 +93,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
 
 
 
-        public void add(string id)
+        public void Add(string id)
         {
             List<string> ids = RegistredMods;
 
@@ -106,12 +106,12 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
         }
 
 
-        public void remove(U3WorkshopMod mod, bool deleteFromServer = false)
+        public void Remove(U3WorkshopMod mod, bool deleteFromServer = false)
         {
-            remove(mod.ID, deleteFromServer);
+            Remove(mod.ID, deleteFromServer);
         }
 
-        public void remove(string id, bool deleteFromServer = false)
+        public void Remove(string id, bool deleteFromServer = false)
         {
             if (Config.Exists)
             {

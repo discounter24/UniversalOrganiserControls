@@ -112,7 +112,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
             }
         }
 
-        public void installMods(params string[] modid)
+        public void InstallMods(params string[] modid)
         {
             foreach (string mod in modid)
             {
@@ -131,7 +131,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
                         currentID = InstallationQueue.Dequeue();
                         if (currentID == "-1")
                         {
-                            exit();
+                            Exit();
                         }
 
                         U3WorkshopModInstallStateChangedEventArgs args = new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.Preparing, currentID);
@@ -139,7 +139,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
 
                         string modTitle = U3WorkshopMod.getModTitle(currentID);
 
-                        foreach (U3WorkshopMod_Managed Mod in server.getWorkshopContentMods().Where((m) => { return m.ID == currentID; }))
+                        foreach (U3WorkshopMod_Managed Mod in server.GetWorkshopContentMods().Where((m) => { return m.ID == currentID; }))
                         {
                             args = new U3WorkshopModInstallStateChangedEventArgs(U3WorkshopModInstallState.RemoveOld, Mod.ID, Mod.Name);
                             U3WorkshopModInstallStateChanged?.Invoke(this, args);
@@ -162,15 +162,15 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
             });
         }
 
-        public void updateServer()
+        public void Update()
         {
-            foreach (U3WorkshopMod_Managed mod in server.getWorkshopContentMods())
+            foreach (U3WorkshopMod_Managed mod in server.GetWorkshopContentMods())
             {
                 InstallationQueue.Enqueue(mod.ID);
             }
         }
 
-        private void exit(bool kill = false)
+        private void Exit(bool kill = false)
         {
             if (!kill)
             {

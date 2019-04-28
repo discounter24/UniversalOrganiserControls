@@ -52,11 +52,11 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
             this.listener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
             this.listener.Start();
 
-            AcceptionLoop = accept();
+            AcceptionLoop = Accept();
         }
 
 
-        private Task accept()
+        private Task Accept()
         {
             running = true;
             return Task.Run(() =>
@@ -102,19 +102,19 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
 
         }
 
-        private void diconnected(ClientConnection con)
+        private void Diconnected(ClientConnection con)
         {
             clients.Remove(con);
         }
 
 
-        public bool send(U3Server userver, string command)
+        public bool Send(U3Server userver, string command)
         {
 
-            ClientConnection con = getConnection(userver);
+            ClientConnection con = GetConnection(userver);
             if (con != null)
             {
-                return con.send(command);
+                return con.Send(command);
             }
             else
             {
@@ -123,7 +123,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
 
         }
 
-        private ClientConnection getConnection(U3Server userver)
+        private ClientConnection GetConnection(U3Server userver)
         {
             foreach (ClientConnection client in clients)
             {
@@ -136,7 +136,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
         }
 
 
-        public bool isConnected(U3Server userver)
+        public bool IsConnected(U3Server userver)
         {
             foreach (ClientConnection client in clients)
             {
@@ -149,7 +149,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
         }
 
 
-        public static bool isCheckPort(int port)
+        public static bool CheckPort(int port)
         {
             bool isAvailable = true;
 
@@ -169,7 +169,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
         }
 
 
-        public void shutdown()
+        public void Shutdown()
         {
             running = false;
             listener.Stop();
@@ -196,12 +196,12 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
             this.client = client;
             Task.Run(() =>
             {
-                listen();
+                Listen();
             });
         }
 
 
-        public U3Server getU3Server(string id)
+        public U3Server GetU3Server(string id)
         {
             foreach(U3Server server in servers.Where((s) => { return s.ServerInformation.ServerID == id; }))
             {
@@ -211,7 +211,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
         }
 
 
-        public bool send(string cmd)
+        public bool Send(string cmd)
         {
             try
             {
@@ -229,7 +229,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
 
 
 
-        private void listen()
+        private void Listen()
         {
             while (client.Connected)
             {
@@ -244,15 +244,15 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
                         if (line.StartsWith("sid://"))
                         {
 
-                            U3Server s = getU3Server(line.Remove(0, 6));
+                            U3Server s = GetU3Server(line.Remove(0, 6));
                             if (s.State == U3ServerState.Running | s.State == U3ServerState.Starting)
                             {
                                 sid = line.Remove(0, 6);
-                                InstanceConnected?.Invoke(getU3Server(sid));
+                                InstanceConnected?.Invoke(GetU3Server(sid));
                             }
                             else
                             {
-                                send("unauthorized_server");
+                                Send("unauthorized_server");
                                 ClientDisconnected?.Invoke(this);
                             }
 
@@ -263,7 +263,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
                             List<string> players = line.Split(';').ToList<string>();
                             players.Remove("");
 
-                            U3Server instance = getU3Server(sid);
+                            U3Server instance = GetU3Server(sid);
                             ReceivedPlayerList?.Invoke(instance,players);
                         }
                         else if (line.StartsWith("consolelog://"))

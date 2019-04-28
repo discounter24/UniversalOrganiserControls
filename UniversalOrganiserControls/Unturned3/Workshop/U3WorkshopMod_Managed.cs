@@ -12,10 +12,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
     public class U3WorkshopMod_Managed
     {
 
-        private static string getUpdateUrl(string SteamSiteUrl)
-        {
-            return string.Format("http://dl.unturned-server-organiser.com/mod.php?modURL={0}", SteamSiteUrl);
-        }
+
         
         private DirectoryInfo path;
 
@@ -62,6 +59,10 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
             }
         }
 
+        private static string GetUpdateUrl(string SteamSiteUrl)
+        {
+            return string.Format("http://dl.unturned-server-organiser.com/mod.php?modURL={0}", SteamSiteUrl);
+        }
 
         public void Delete()
         {
@@ -98,7 +99,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
                     }
                     else
                     {
-                        List<string> content = new List<string>();
+                        var content = new List<string>();
                         content.Add(U3WorkshopMod.getModTitle(ID));
                         content.Add(ID);
                         try
@@ -119,11 +120,11 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
         }
 
 
-        public static string[] getIDsFromURL(string url)
+        public static string[] GetIDsFromURL(string url)
         {
             try
             {
-                string response = new WebClient().DownloadString(getUpdateUrl(url));
+                string response = new WebClient().DownloadString(GetUpdateUrl(url));
                 if (response == "invalid request")
                 {
                     return new string[] { "invalid request" };

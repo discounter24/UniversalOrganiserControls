@@ -110,7 +110,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
         /// Installs or updates Unturned 3 game files.
         /// </summary>
         /// <returns></returns>
-        public Task<U3InstallationState> update()
+        public Task<U3InstallationState> Update()
         {
            
             return Task.Run(() =>
@@ -212,7 +212,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
                     if (FreshInstall)
                     {
                         InstallationProgressChanged?.Invoke(this, new U3OnlineInstallationProgressArgs(U3InstallationState.DeletingOldFiles));
-                        deleteOldFiles();
+                        DeleteOldFiles();
                     }
 
 
@@ -309,7 +309,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
         /// <summary>
         /// Deletes old game files.
         /// </summary>
-        public void deleteOldFiles()
+        public void DeleteOldFiles()
         {
             try
             {
@@ -351,7 +351,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
         /// <summary>
         /// Aborts the installation process.
         /// </summary>
-        public void abort() { Aborted = true; }
+        public void Abort() { Aborted = true; }
 
 
 

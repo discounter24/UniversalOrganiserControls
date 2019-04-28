@@ -35,25 +35,7 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
         private DirectoryInfo gamedir;
 
 
-        public async Task<string> getServerVersion()
-        {
 
-            var task = Task.Run(() =>
-            {
-                string result;
-                try
-                {
-                    result = new WebClient().DownloadString(versionAddr);
-                }
-                catch (Exception)
-                {
-                    result = "(not available)";
-                }
-                return result;
-            });
-
-            return await task;
-        }
 
         public string LocalVersion
         {
@@ -80,12 +62,31 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
         }
 
 
+        public async Task<string> GetServerVersion()
+        {
 
-        public async Task<bool> isUpdateAvailable()
+            var task = Task.Run(() =>
+            {
+                string result;
+                try
+                {
+                    result = new WebClient().DownloadString(versionAddr);
+                }
+                catch (Exception)
+                {
+                    result = "(not available)";
+                }
+                return result;
+            });
+
+            return await task;
+        }
+
+        public async Task<bool> IsUpdateAvailable()
         {
             var task = Task.Run(() =>
             {
-                bool result = !LocalVersion.Equals(getServerVersion().Result);
+                bool result = !LocalVersion.Equals(GetServerVersion().Result);
                 return result;
             });
 
@@ -99,16 +100,16 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod
         }
 
 
-        public async Task<RocketModInstallationCompletedType> install(bool clean = false)
+        public async Task<RocketModInstallationCompletedType> Install(bool clean = false)
         {
             var task = Task.Run(() =>
             {
                 try
                 {
-                    bool updateAvailable = isUpdateAvailable().Result;
+                    bool updateAvailable = IsUpdateAvailable().Result;
                     if (clean | updateAvailable)
                     {
-                        string v = getServerVersion().Result;
+                        string v = GetServerVersion().Result;
                         try
                         {
                             string tmpFile = gamedir.FullName + "\\rocketmod.tmp";

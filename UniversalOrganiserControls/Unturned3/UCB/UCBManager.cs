@@ -26,7 +26,7 @@ namespace UniversalOrganiserControls.Unturned3.UCB
         public event EventHandler<U3Server> ServerIdentified;
         public event EventHandler<U3Server> ServerDisconnected;
 
-        public UCBServer server { get; private set; }
+        public UCBServer Server { get; private set; }
 
         public List<U3Server> AvailableServers { get; private set; }
 
@@ -40,17 +40,17 @@ namespace UniversalOrganiserControls.Unturned3.UCB
         {
             AvailableServers = new List<U3Server>();
 
-            server = new UCBServer(port);
-            server.ConnectionIdentified += Server_ConnectionIdentified;
-            server.PackageReceived += Server_PackageReceived;
-            server.ConnetionClosed += Server_ConnetionClosed;
+            Server = new UCBServer(port);
+            Server.ConnectionIdentified += Server_ConnectionIdentified;
+            Server.PackageReceived += Server_PackageReceived;
+            Server.ConnetionClosed += Server_ConnetionClosed;
         }
 
-        public void shutdown()
+        public void Shutdown()
         {
             try
             {
-                server.shutdown();
+                Server.shutdown();
             }
             catch (Exception)  { }
         
@@ -92,14 +92,14 @@ namespace UniversalOrganiserControls.Unturned3.UCB
             }
         }
 
-        public bool isIdentifed(U3Server server)
+        public bool IsIdentifed(U3Server server)
         {
             return IdentifiedServers.ContainsValue(server);
         }
 
-        public UCBServerConnection getConnection(U3Server server)
+        public UCBServerConnection GetConnection(U3Server server)
         {
-            if (isIdentifed(server))
+            if (IsIdentifed(server))
             {
                 foreach (UCBServerConnection con in IdentifiedServers.Keys)
                 {
@@ -113,14 +113,14 @@ namespace UniversalOrganiserControls.Unturned3.UCB
         }
 
 
-        public bool sendPackage(U3Server server, OPackage package)
+        public bool SendPackage(U3Server server, OPackage package)
         {
-            if (isIdentifed(server))
+            if (IsIdentifed(server))
             {
                 try
                 {
 
-                    UCBServerConnection con = getConnection(server);
+                    UCBServerConnection con = GetConnection(server);
                     if (con != null)
                     {
                         con.send(package);
@@ -139,11 +139,11 @@ namespace UniversalOrganiserControls.Unturned3.UCB
             }
         }
 
-        public bool sendCommand(U3Server server, string command)
+        public bool SendCommand(U3Server server, string command)
         {
 
             StringPackage package = new StringPackage(NetPackageHeader.Command, command);
-            return sendPackage(server,package);
+            return SendPackage(server,package);
         }
                     
     }

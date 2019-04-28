@@ -580,7 +580,7 @@ namespace UniversalOrganiserControls.Unturned3
         /// <summary>
         /// Tries to save all server configs
         /// </summary>
-        public void saveConfigs()
+        public void SaveConfigs()
         {
             try
             {
@@ -608,7 +608,7 @@ namespace UniversalOrganiserControls.Unturned3
                 {
                     if (BattlEyeEnabled)
                     {
-                        if (!startBattlEyeService())
+                        if (!StartBattlEyeService())
                         {
                             State = U3ServerState.Stopped;
                             return U3ServerStartResult.BattlEyeFail;
@@ -675,9 +675,9 @@ namespace UniversalOrganiserControls.Unturned3
         /// <summary>
         /// Requests the UCB Manager to get a complete console log
         /// </summary>
-        public void requestServerLog()
+        public void RequestServerLog()
         {
-            UCBManager.sendPackage(this, new OPackage(NetPackageHeader.GameOutputRequest));
+            UCBManager.SendPackage(this, new OPackage(NetPackageHeader.GameOutputRequest));
         }
 
         /// <summary>
@@ -686,17 +686,17 @@ namespace UniversalOrganiserControls.Unturned3
         /// <param name="countdown">Waits cooldown seconds until the server will be stopped</param>
         public void Stop(int countdown)
         {
-            initShutdownCountdown(countdown);
+            InitShutdownCountdown(countdown);
 
             DisableAutoRestartOnceFlag = true;
             State = U3ServerState.Stopping;
             if (countdown == 0)
             {
-                sendCommand("shutdown 0");
+                SendCommand("shutdown 0");
             }
             else
             {
-                sendCommand(string.Format("shutdown {0}", countdown));
+                SendCommand(string.Format("shutdown {0}", countdown));
             }
         }
 
@@ -707,16 +707,16 @@ namespace UniversalOrganiserControls.Unturned3
         /// <param name="countdown">Waits cooldown seconds until the server will be restarted</param>
         public void Restart(int countdown)
         {
-            initShutdownCountdown(countdown);
+            InitShutdownCountdown(countdown);
             EnableAutoRestartOnceFlag = true;
             State = U3ServerState.Restarting;
             if (countdown == 0)
             {
-                sendCommand("shutdown 0");
+                SendCommand("shutdown 0");
             }
             else
             {
-                sendCommand(string.Format("shutdown {0}", countdown));
+                SendCommand(string.Format("shutdown {0}", countdown));
             }
         }
 
@@ -748,18 +748,18 @@ namespace UniversalOrganiserControls.Unturned3
         /// Boradcasts a message on the server
         /// </summary>
         /// <param name="text">The message to be broadcasted.</param>
-        public void say(string text)
+        public void Say(string text)
         {
-            sendCommand("/broadcast " + text);
+            SendCommand("/broadcast " + text);
         }
 
         /// <summary>
         /// Tries to execute a command in the server console.
         /// </summary>
         /// <param name="command">The command to be executed.</param>
-        public void sendCommand(string command)
+        public void SendCommand(string command)
         {
-            if (UCBManager == null || !UCBManager.sendCommand(this,command))
+            if (UCBManager == null || !UCBManager.SendCommand(this,command))
             {
                 if (_process != null && !_process.HasExited)
                 {
@@ -785,7 +785,7 @@ namespace UniversalOrganiserControls.Unturned3
         /// Gets all Steam workshop mods installed on the server
         /// </summary>
         /// <returns>A list of workshop mods</returns>
-        public IEnumerable<U3WorkshopMod_Managed> getWorkshopContentMods()
+        public IEnumerable<U3WorkshopMod_Managed> GetWorkshopContentMods()
         {
             List<U3WorkshopMod_Managed> installed = new List<U3WorkshopMod_Managed>();
             DirectoryInfo contentMods = new DirectoryInfo(ServerInformation.ServerDirectory.FullName + "\\Workshop\\Content");
@@ -807,9 +807,9 @@ namespace UniversalOrganiserControls.Unturned3
         /// </summary>
         /// <param name="name">The name of the mod to search for</param>
         /// <returns>The mod found</returns>
-        public U3WorkshopMod_Managed getModByName(string name)
+        public U3WorkshopMod_Managed GetModByName(string name)
         {
-            return getWorkshopContentMods().First((s) => { return s.Name == name; });
+            return GetWorkshopContentMods().First((s) => { return s.Name == name; });
         }
 
         /// <summary>
@@ -817,7 +817,7 @@ namespace UniversalOrganiserControls.Unturned3
         /// </summary>
         /// <param name="ignoreAlreadyInstalled">Set for ignoring the current installation state</param>
         /// <returns>Returns true when the service has been installed successfully</returns>
-        public bool installBattlEyeService(bool ignoreAlreadyInstalled = false)
+        public bool InstallBattlEyeService(bool ignoreAlreadyInstalled = false)
         {
             if (!BattlEyeInstalled | ignoreAlreadyInstalled)
             {
@@ -846,9 +846,9 @@ namespace UniversalOrganiserControls.Unturned3
         /// Starts the BattlEye anti cheat service
         /// </summary>
         /// <returns>Returns true if started successfully</returns>
-        public bool startBattlEyeService()
+        public bool StartBattlEyeService()
         {
-            if (!installBattlEyeService())
+            if (!InstallBattlEyeService())
             {
                 return false;
             }
@@ -894,7 +894,7 @@ namespace UniversalOrganiserControls.Unturned3
             }
         }
 
-        private void updateRocketBridgeConfig()
+        private void UpdateRocketBridgeConfig()
         {
             if (RocketModInstalled & RocketBridge != null)
             {
@@ -938,7 +938,7 @@ namespace UniversalOrganiserControls.Unturned3
 
                 if (_process == null)
                 {
-                    int PID = Convert.ToInt32(UCBManager.getConnection(this).PID);
+                    int PID = Convert.ToInt32(UCBManager.GetConnection(this).PID);
                     _process = Process.GetProcessById(PID);
                     _process.EnableRaisingEvents = true;
                     _process.Exited += (p, e2) => { State = U3ServerState.Stopped; };
@@ -971,34 +971,34 @@ namespace UniversalOrganiserControls.Unturned3
             }
         }
 
-        private void initShutdownCountdown(int countdown)
+        private void InitShutdownCountdown(int countdown)
         {
             if (countdown != 0)
             {
 
                 try
                 {
-                    say(string.Format(ServerInformation.ShutdownMessage, countdown.ToString()));
+                    Say(string.Format(ServerInformation.ShutdownMessage, countdown.ToString()));
                 }
                 catch (Exception)
                 {
-                    say(ServerInformation.ShutdownMessage);
+                    Say(ServerInformation.ShutdownMessage);
                 }
 
                 Task.Run(async () =>
                 {
-                    sendCommand(string.Format("shutdown {0}", countdown));
+                    SendCommand(string.Format("shutdown {0}", countdown));
                     for (int i = countdown; i >= 0; i--)
                     {
                         if (i % ServerInformation.ShutdownMessageIntervall == 0)
                         {
                             try
                             {
-                                say(string.Format(ServerInformation.ShutdownMessage, i.ToString()));
+                                Say(string.Format(ServerInformation.ShutdownMessage, i.ToString()));
                             }
                             catch (Exception)
                             {
-                                say(ServerInformation.ShutdownMessage);
+                                Say(ServerInformation.ShutdownMessage);
                             }
                         }
                         await Task.Delay(1000);
