@@ -50,18 +50,30 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
             }
         }
 
-        public static AdvancedConfig loadJson(U3Server instance)
+        public static AdvancedConfig loadJson(U3Server server)
         {
-            FileInfo configFile = new FileInfo(instance.ServerInformation.ServerDirectory.FullName + "\\config.json");
+            FileInfo configFile = new FileInfo(server.ServerInformation.ServerDirectory.FullName + "\\config.json");
             if (configFile.Exists)
             {
-                return JsonConvert.DeserializeObject<AdvancedConfig>(File.ReadAllText(instance.ServerInformation.ServerDirectory.FullName + "\\config.json"));
+                return JsonConvert.DeserializeObject<AdvancedConfig>(File.ReadAllText(server.ServerInformation.ServerDirectory.FullName + "\\config.json"));
             }
             else
             {
                 return null;
             }
+        }
 
+        public static void save(U3Server server, AdvancedConfig config)
+        {
+            try
+            {
+                FileInfo configFile = new FileInfo(server.ServerInformation.ServerDirectory.FullName + "\\config.json");
+                File.WriteAllText(configFile.FullName, config.getJson());
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
 
