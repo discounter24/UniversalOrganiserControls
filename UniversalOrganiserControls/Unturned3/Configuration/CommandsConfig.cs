@@ -20,6 +20,11 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
             load();
         }
 
+        public CommandsConfig(U3Server server)
+        {
+            dat = prepareFile(server.ServerInformation.ServerDirectory);
+            load();
+        }
 
         private FileInfo prepareFile(DirectoryInfo serverdir)
         {

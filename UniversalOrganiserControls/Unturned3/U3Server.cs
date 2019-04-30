@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using UniversalOrganiserControls;
 using UniversalOrganiserControls.Unturned3.Configuration;
 using UniversalOrganiserControls.Unturned3.RocketMod;
+using UniversalOrganiserControls.Unturned3.RocketMod.Configuration;
 using UniversalOrganiserControls.Unturned3.Workshop;
 using UniversalOrganiserControls.Unturned3.UCB;
 using OrganiserNetworking.Packages;
@@ -487,6 +488,10 @@ namespace UniversalOrganiserControls.Unturned3
         /// </summary>
         public CommandsConfig ServerConfig {  get; private set; }
 
+        /// <summary>
+        /// Holds the RocketMod config for the server
+        /// </summary>
+        public RocketConfig RocketConfig { get; private set; }
 
         /// <summary>
         /// Holds the AdvancedConfig for the server
@@ -572,9 +577,7 @@ namespace UniversalOrganiserControls.Unturned3
             this.ServerInformation = info;
             this.RocketBridge = rocketBridge;
             this.PluginManager = new RocketPluginManager(this);
-            this.ServerConfig = new CommandsConfig(ServerInformation.ServerDirectory); 
-            this.AdvancedConfig = AdvancedConfig.loadJson(this);
-            this.WorkshopAutoUpdaterConfig = new U3WorkshopAutoUpdaterConfig(this);
+            ReloadConfigs();
         }
 
         /// <summary>
@@ -584,13 +587,45 @@ namespace UniversalOrganiserControls.Unturned3
         {
             try
             {
-                this.ServerConfig.save();
-                AdvancedConfig.save(this, this.AdvancedConfig);
+                if (ServerConfig != null) this.ServerConfig.save();
+                if (AdvancedConfig != null) this.AdvancedConfig.save(this);
+                if (RocketConfig != null) this.RocketConfig.save();
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Reloads alls configs
+        /// </summary>
+        public void ReloadConfigs()
+        {
+            try
+            {
+                this.ServerConfig = new CommandsConfig(this);
+            }
+            catch (Exception) { }
+
+            try
+            {
+                this.AdvancedConfig = AdvancedConfig.loadJson(this);
+            }
+            catch (Exception) { }
+
+            try
+            {
+                this.WorkshopAutoUpdaterConfig = new U3WorkshopAutoUpdaterConfig(this);
+            }
+            catch (Exception) { }
+
+            try
+            {
+                this.RocketConfig = new RocketConfig(this);
+            }
+            catch (Exception) { }
+
         }
 
 

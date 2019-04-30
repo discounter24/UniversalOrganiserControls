@@ -40,22 +40,33 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
 
         public static AdvancedConfig loadJson(string file)
         {
-            try
+            if (File.Exists(file))
             {
-                return JsonConvert.DeserializeObject<AdvancedConfig>(File.ReadAllText(file));
-            }
-            catch (Exception)
-            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<AdvancedConfig>(File.ReadAllText(file));
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            } else {
                 return null;
             }
+
+        }
+
+        public void save(U3Server server)
+        {
+            AdvancedConfig.save(server, this);
         }
 
         public static AdvancedConfig loadJson(U3Server server)
         {
-            FileInfo configFile = new FileInfo(server.ServerInformation.ServerDirectory.FullName + "\\config.json");
+            FileInfo configFile = new FileInfo(server.ServerInformation.ServerDirectory.FullName + "\\Config.json");
             if (configFile.Exists)
             {
-                return JsonConvert.DeserializeObject<AdvancedConfig>(File.ReadAllText(server.ServerInformation.ServerDirectory.FullName + "\\config.json"));
+                return JsonConvert.DeserializeObject<AdvancedConfig>(File.ReadAllText(server.ServerInformation.ServerDirectory.FullName + "\\Config.json"));
             }
             else
             {
@@ -67,7 +78,7 @@ namespace UniversalOrganiserControls.Unturned3.Configuration
         {
             try
             {
-                FileInfo configFile = new FileInfo(server.ServerInformation.ServerDirectory.FullName + "\\config.json");
+                FileInfo configFile = new FileInfo(server.ServerInformation.ServerDirectory.FullName + "\\Config.json");
                 File.WriteAllText(configFile.FullName, config.getJson());
             }
             catch (Exception)

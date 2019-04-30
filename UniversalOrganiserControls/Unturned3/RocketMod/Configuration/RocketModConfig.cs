@@ -22,12 +22,21 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
         private XmlDocument RocketUnturnedXML = new XmlDocument();
 
 
+        public RocketConfig(U3Server server) : this(new DirectoryInfo(server.ServerInformation.ServerDirectory.FullName + "\\Rocket\\"))
+        {
+
+        }
 
         public RocketConfig(DirectoryInfo rocketFolder)
         {
 
             this.rocketFolder = rocketFolder;
+            reload();
+        }
 
+
+        public void reload()
+        {
             if (this.rocketFolder.Exists)
             {
                 FileInfo RocketUnturnedFile = new FileInfo(this.rocketFolder.FullName + "\\Rocket.Unturned.config.xml");
@@ -48,7 +57,6 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
             {
                 throw new Exception("Rocket folder does not exist.");
             }
-
         }
 
         public void save()
@@ -299,12 +307,12 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
         {
             get
             {
-                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/CharacterNameValidation");
+                XmlNode node = RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/CharacterNameValidation");
                 return Convert.ToBoolean(node.InnerText);
             }
             set
             {
-                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/CharacterNameValidation").InnerText = value.ToString().ToLower();
+                RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/CharacterNameValidation").InnerText = value.ToString().ToLower();
             }
         }
 
@@ -312,12 +320,12 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
         {
             get
             {
-                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/CharacterNameValidationRule");
+                XmlNode node = RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/CharacterNameValidationRule");
                 return node.InnerText;
             }
             set
             {
-                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/CharacterNameValidationRule").InnerText = value.ToString();
+                RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/CharacterNameValidationRule").InnerText = value.ToString();
             }
         }
 
@@ -325,12 +333,12 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
         {
             get
             {
-                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/MaxSpawnAmount");
+                XmlNode node = RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/MaxSpawnAmount");
                 return node.InnerText;
             }
             set
             {
-                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/MaxSpawnAmount").InnerText = value.ToString();
+                RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/MaxSpawnAmount").InnerText = value.ToString();
             }
         }
 
@@ -338,12 +346,12 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
         {
             get
             {
-                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableVehicleBlacklist");
+                XmlNode node = RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/EnableVehicleBlacklist");
                 return Convert.ToBoolean(node.InnerText);
             }
             set
             {
-                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableVehicleBlacklist").InnerText = value.ToString().ToLower();
+                RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/EnableVehicleBlacklist").InnerText = value.ToString().ToLower();
             }
         }
 
@@ -351,12 +359,12 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
         {
             get
             {
-                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableItemBlacklist");
+                XmlNode node = RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/EnableItemBlacklist");
                 return Convert.ToBoolean(node.InnerText);
             }
             set
             {
-                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableItemBlacklist").InnerText = value.ToString().ToLower();
+                RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/EnableItemBlacklist").InnerText = value.ToString().ToLower();
             }
         }
 
@@ -364,12 +372,12 @@ namespace UniversalOrganiserControls.Unturned3.RocketMod.Configuration
         {
             get
             {
-                XmlNode node = RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableItemSpawnLimit");
+                XmlNode node = RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/EnableItemSpawnLimit");
                 return Convert.ToBoolean(node.InnerText);
             }
             set
             {
-                RocketXML.DocumentElement.SelectSingleNode("/RocketSettings/EnableItemSpawnLimit").InnerText = value.ToString().ToLower();
+                RocketUnturnedXML.DocumentElement.SelectSingleNode("/UnturnedSettings/EnableItemSpawnLimit").InnerText = value.ToString().ToLower();
             }
         }
 

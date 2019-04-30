@@ -34,7 +34,7 @@ namespace UniversalOrganiserControls.Unturned3.Modules
                     {
                         return ModuleInstalltionResult.FAILED_DEST;
                     }
-                    UtilsGeneral.extractZip(new FileInfo(modZipFile), new DirectoryInfo(modulesFolder));
+                    UtilsGeneral.extractZipSerial(new FileInfo(modZipFile), new DirectoryInfo(modulesFolder));
                     return ModuleInstalltionResult.OK;
                 }
                 catch (Exception)
