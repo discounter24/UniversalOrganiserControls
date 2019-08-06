@@ -35,7 +35,7 @@ namespace UniversalOrganiserControls.Steam
         public event AppUpdateStateChanged AppUpdateStateChanged;
 
         private FileInfo SteamExeFile;
-        private Process Steam;
+        private Process process;
 
         private ManualResetEvent waitStartAsync = new ManualResetEvent(false);
 
@@ -64,36 +64,40 @@ namespace UniversalOrganiserControls.Steam
 
         private void start(bool asAdmin = false)
         {
-            Steam = new Process();
-            Steam.StartInfo.FileName = SteamExeFile.FullName;
 
-            Steam.StartInfo.RedirectStandardError = true;
-            Steam.StartInfo.RedirectStandardInput = true;
-            Steam.StartInfo.RedirectStandardOutput = true;
-            Steam.StartInfo.UseShellExecute = false;
+            process = new Process();
+            process.StartInfo.FileName = "powershell.exe";
 
-            Steam.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardInput = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
 
-            Steam.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            //Steam.StartInfo.CreateNoWindow = true;
 
-            if (asAdmin) Steam.StartInfo.Verb = "runas";
+            //process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+
+            if (asAdmin) process.StartInfo.Verb = "runas";
 
 
-            Steam.Start();
+            process.Start();
+            process.StandardInput.AutoFlush = true;
+            process.StandardInput.WriteLine(SteamExeFile);
 
-            Steam.EnableRaisingEvents = true;
+
+            process.EnableRaisingEvents = true;
 
 
             Task.Run(async () =>
             {
                 try
                 {
-                    while (!Steam.HasExited)
+                    while (!process.HasExited)
                     {
                         try
                         {
-                            string line = await Steam.StandardOutput.ReadLineAsync();
-                            Steam_DataReceived(Steam, line);
+                            string line = await process.StandardOutput.ReadLineAsync();
+                            Steam_DataReceived(process, line);
                         }
                         catch (Exception)
                         {
@@ -106,10 +110,11 @@ namespace UniversalOrganiserControls.Steam
             });
 
 
-            Steam.Exited += Steam_Exited;
+            process.Exited += Steam_Exited;
             
 
             waitStartAsync.WaitOne();
+
         }
 
         private void Steam_Exited(object sender, EventArgs e)
@@ -303,9 +308,9 @@ namespace UniversalOrganiserControls.Steam
                 sendCommand("logout");
                 sendCommand("exit");
 
-                if (!Steam.WaitForExit(timeout))
+                if (!process.WaitForExit(timeout))
                 {
-                    Steam.Kill();
+                    process.Kill();
                 }
                 SteamExited?.Invoke(this, reason);
             });
@@ -334,6 +339,24 @@ namespace UniversalOrganiserControls.Steam
         public int percentage = 0;
         public long receivedBytes = 0;
         public long totalBytes = 0;
+
+        public override String ToString()
+        {
+            switch (stage)
+            {
+                case UpdateStateStage.Validating:
+                    return String.Format("Validating game files {0} ({1}/{2})..",percentage,receivedBytes,totalBytes);
+                case UpdateStateStage.Downloading:
+                    return String.Format("Downloading game files {0} ({1}/{2})..", percentage, receivedBytes, totalBytes);
+                case UpdateStateStage.Commiting:
+                    return String.Format("Commiting game files {0} ({1}/{2})..", percentage, receivedBytes, totalBytes);
+                case UpdateStateStage.Preallocating:
+                    return String.Format("Preallocating game files {0} ({1}/{2})..", percentage, receivedBytes, totalBytes);
+                default:
+                    return stage.ToString();
+            }
+
+        }
     }
 
 

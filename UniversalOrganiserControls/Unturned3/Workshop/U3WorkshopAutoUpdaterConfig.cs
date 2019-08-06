@@ -12,6 +12,7 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
     public class U3WorkshopAutoUpdaterConfig
     {
 
+        private FileInfo ConfigFile => new FileInfo(server.ServerInformation.ServerDirectory.FullName + "\\WorkshopDownloadConfig.json");
         private U3Server server;
         
 
@@ -20,7 +21,29 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
             get => server.ServerInformation.ServerDirectory.FullName + "Workshop\\Steam\\content\\304930";
         }
 
-        private FileInfo Config => new FileInfo(server.ServerInformation.ServerDirectory.FullName + "\\WorkshopDownloadIDs.json");
+
+        private WorkshopFileJsonObject _tmpJson = null;
+        private WorkshopFileJsonObject JsonObject
+        {
+            get
+            {
+                if (_tmpJson != null) return _tmpJson;
+
+                _tmpJson = new WorkshopFileJsonObject();
+                try
+                {
+
+                    var obj = JsonConvert.DeserializeObject<dynamic>(File.ReadAllText(ConfigFile.FullName));
+                    _tmpJson = obj.ToObject<WorkshopFileJsonObject>();
+                }
+                catch (Exception ex) {
+                    
+                }
+
+                return _tmpJson;
+            }
+        }
+       
 
         public IEnumerable<U3WorkshopMod> InstalledMods
         {
@@ -68,19 +91,8 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
         {
             get
             {
-                if (!Config.Directory.Exists) Config.Directory.Create();
-                List<string> ids = new List<string>();
-
-                if (Config.Exists)
-                {
-                    string json = File.ReadAllText(Config.FullName);
-                    JArray arr = JArray.Parse(json);
-
-                    ids = arr.ToObject<List<string>>();
-
-                }
-
-                return ids;
+                if (!ConfigFile.Directory.Exists) ConfigFile.Directory.Create();
+                return JsonObject.File_IDs;
             }
         }
 
@@ -95,14 +107,13 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
 
         public void Add(string id)
         {
-            List<string> ids = RegistredMods;
-
-            if (!ids.Contains(id))
+            JsonObject.File_IDs = RegistredMods;
+            if (!JsonObject.File_IDs.Contains(id))
             {
-                ids.Add(id);
+                JsonObject.File_IDs.Add(id);
             }
 
-            File.WriteAllText(Config.FullName, JsonConvert.SerializeObject(ids));
+            JsonObject.save(ConfigFile.FullName);
         }
 
 
@@ -113,11 +124,12 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
 
         public void Remove(string id, bool deleteFromServer = false)
         {
-            if (Config.Exists)
+            if (ConfigFile.Exists)
             {
-                List<string> ids = RegistredMods;
-                ids.Remove(id);
-                File.WriteAllText(Config.FullName, JsonConvert.SerializeObject(ids));
+                JsonObject.File_IDs = RegistredMods;
+                JsonObject.File_IDs.Remove(id);
+
+                JsonObject.save(ConfigFile.FullName);
 
                 if (deleteFromServer)
                 {
@@ -129,6 +141,18 @@ namespace UniversalOrganiserControls.Unturned3.Workshop
                         }
                     }
                 }
+            }
+        }
+
+        private class WorkshopFileJsonObject
+        {
+            public List<string> File_IDs = new List<string>();
+            public int Query_Cache_Max_Age_Seconds = 600;
+            public int Max_Query_Retries = 2;
+
+            public void save(string file)
+            {
+                File.WriteAllText(file, JsonConvert.SerializeObject(this));
             }
         }
     }

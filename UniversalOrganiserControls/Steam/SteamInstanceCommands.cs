@@ -15,12 +15,13 @@ namespace UniversalOrganiserControls.Steam
 
         public void sendCommand(string command)
         {
-            if (Steam != null)
+            if (process != null)
             {
-                Steam.StandardInput.WriteLine(command);
-                Steam.StandardInput.Flush();
-                Steam.StandardInput.WriteLine(" " + Steam.StandardInput.NewLine);
-                Steam.StandardInput.Flush();
+                process.StandardInput.AutoFlush = true;
+                process.StandardInput.WriteLine(command);
+                //Steam.StandardInput.Flush();
+                //Steam.StandardInput.WriteLine(" " + Steam.StandardInput.NewLine);
+                //Steam.StandardInput.Flush();
             }
         }
 

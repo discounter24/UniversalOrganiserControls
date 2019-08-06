@@ -30,7 +30,7 @@ namespace UniversalOrganiserControls.Steam
 
 
 
-        public Task<LoginResult> login(string username, string password = "", string code = "")
+        public Task<LoginResult> login(string username = null, string password = "", string code = "")
         {
             return Task<LoginResult>.Run(() =>
             {

@@ -10,7 +10,7 @@ namespace UniversalOrganiserControls.Unturned3.Installer
 {
     public class U3SteamInstaller : SteamGameInstaller
     {
-        public const int APP_ID = 304930;
+        public const int APP_ID = 1110390;
 
         public U3SteamInstaller(SteamInstance steam) : base(steam) {}
 
