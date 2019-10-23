@@ -7,7 +7,7 @@ Please dontate to keep this repository maintained:
 https://www.paypal.me/unturneduso
 
 ### Support or Contact
-Discord: https://discord.gg/8sMTPEH
+Discord: https://unturned-server-organiser.com/discord
 Mail (for business): support@unturned-server-organiser.com
 
 
